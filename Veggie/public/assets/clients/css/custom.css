@@ -1,0 +1,458 @@
+.profile-pic-container {
+    position: relative;
+    display: inline-block;
+}
+.profile-pic {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    cursor: pointer;
+    border: 2px solid #ddd;
+}
+.profile-pic-container:hover .profile-pic {
+    border-color: #aaa;
+}
+
+/* Add-address modal customization */
+#addAddressModal .modal-dialog {
+    max-width: 620px;
+    margin: 60px auto;
+}
+
+#addAddressModal .modal-content {
+    border: 0;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 20px 45px rgba(12, 36, 62, 0.18);
+}
+
+#addAddressModal .modal-header {
+    padding: 20px 26px;
+    border-bottom: 1px solid #edf1f5;
+    background: #f9fcf6;
+}
+
+#addAddressModal .modal-title {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #1d2a39;
+}
+
+#addAddressModal .btn-close {
+    opacity: 0.55;
+    transition: opacity 0.2s ease;
+}
+
+#addAddressModal .btn-close:hover {
+    opacity: 1;
+}
+
+#addAddressModal .modal-body {
+    padding: 24px 26px 28px;
+    background: #fff;
+}
+
+#addAddressForm .mb-3 {
+    margin-bottom: 16px !important;
+}
+
+#addAddressForm .form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #2a3645;
+}
+
+#addAddressForm .form-control {
+    height: 50px;
+    border: 1px solid #d8e0e8;
+    border-radius: 10px;
+    font-size: 16px;
+    padding: 10px 14px;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+#addAddressForm .form-control:focus {
+    border-color: #80b500;
+    box-shadow: 0 0 0 3px rgba(128, 181, 0, 0.15);
+}
+
+#addAddressForm .mb-3:last-of-type {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 2px;
+}
+
+#addAddressForm .mb-3:last-of-type .form-label {
+    margin-bottom: 0;
+    font-weight: 600;
+}
+
+#addAddressForm .form-check-input {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    border: 1px solid #b6c0cb;
+    cursor: pointer;
+}
+
+#addAddressForm .form-check-input:checked {
+    background-color: #80b500;
+    border-color: #80b500;
+}
+
+#addAddressForm button[type="submit"] {
+    width: 100%;
+    min-height: 50px;
+    margin-top: 8px;
+    font-size: 20px;
+    font-weight: 700;
+    text-transform: none;
+    border-radius: 10px;
+}
+
+@media (max-width: 767.98px) {
+    #addAddressModal .modal-dialog {
+        margin: 12px;
+    }
+
+    #addAddressModal .modal-header,
+    #addAddressModal .modal-body {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    #addAddressModal .modal-title {
+        font-size: 22px;
+    }
+
+    #addAddressForm .form-control {
+        height: 46px;
+        font-size: 15px;
+    }
+
+    #addAddressForm button[type="submit"] {
+        font-size: 18px;
+    }
+}
+
+/* Account address action buttons */
+#liton_tab_addresses .table td .btn.btn-sm {
+    min-width: 132px;
+    height: 36px;
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1;
+    border-width: 1px;
+    transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        background-color 0.18s ease,
+        border-color 0.18s ease;
+}
+
+#liton_tab_addresses .table td .btn.btn-sm.btn-primary {
+    color: #fff;
+    background-color: #2f9f5f;
+    border-color: #2f9f5f;
+    box-shadow: 0 6px 14px rgba(47, 159, 95, 0.22);
+}
+
+#liton_tab_addresses .table td .btn.btn-sm.btn-primary:hover,
+#liton_tab_addresses .table td .btn.btn-sm.btn-primary:focus {
+    color: #fff;
+    background-color: #288a52;
+    border-color: #288a52;
+    transform: translateY(-1px);
+}
+
+#liton_tab_addresses .table td .btn.btn-sm.btn-danger {
+    color: #fff;
+    background-color: #db3f4e;
+    border-color: #db3f4e;
+    box-shadow: 0 6px 14px rgba(219, 63, 78, 0.22);
+}
+
+#liton_tab_addresses .table td .btn.btn-sm.btn-danger:hover,
+#liton_tab_addresses .table td .btn.btn-sm.btn-danger:focus {
+    color: #fff;
+    background-color: #c83342;
+    border-color: #c83342;
+    transform: translateY(-1px);
+}
+
+#liton_tab_addresses .table td .btn.btn-sm:active {
+    transform: translateY(0);
+}
+
+@media (max-width: 767.98px) {
+    #liton_tab_addresses .table td .btn.btn-sm {
+        min-width: 112px;
+        height: 34px;
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+}
+
+.category-filter.active {
+    color: var(--ltn_secondary-color);
+    font-weight: bold;
+    text-decoration: underline;
+}
+/* Loading spinner styles */
+.loader {
+    width: 48px;
+    height: 48px;
+    border: 3px dotted #fff;
+    border-style: solid solid dotted dotted;
+    border-radius: 50%;
+    display: inline-block;
+    position: relative;
+    box-sizing: border-box;
+    animation: rotation 2s linear infinite;
+}
+.loader::after {
+    content: "";
+    box-sizing: border-box;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    border: 3px dotted #ff3d00;
+    border-style: solid solid dotted;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    animation: rotationBack 1s linear infinite;
+    transform-origin: center center;
+}
+
+@keyframes rotation {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+@keyframes rotationBack {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(-360deg);
+    }
+}
+/*Check out page styles*/
+.select-address {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+/* --------------------Order detail page -----------------------*/
+.order-detail-page {
+    position: relative;
+}
+
+.order-detail-page .order-detail-card {
+    background: linear-gradient(180deg, #ffffff 0%, #f9fbf5 100%);
+    border: 1px solid #e8efd9;
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 10px 30px rgba(39, 58, 22, 0.06);
+}
+
+.order-detail-page .order-detail-header h3 {
+    margin: 0;
+    font-size: 30px;
+    color: #1f2f11;
+    font-weight: 700;
+}
+
+.order-detail-page .order-detail-date {
+    margin-top: 8px;
+    margin-bottom: 0;
+    color: #5b6d4a;
+    font-size: 15px;
+}
+
+.order-detail-page .order-summary-grid {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.order-detail-page .order-summary-item {
+    background: #fff;
+    border: 1px solid #edf3e2;
+    border-radius: 14px;
+    padding: 14px;
+}
+
+.order-detail-page .summary-label {
+    display: block;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #7a8e67;
+    margin-bottom: 8px;
+    font-weight: 700;
+}
+
+.order-detail-page .summary-value {
+    color: #2a3d16;
+    font-weight: 600;
+}
+
+.order-detail-page .order-summary-item.total {
+    background: linear-gradient(135deg, #eaf8c5 0%, #d6f0a0 100%);
+    border-color: #d2e9a0;
+}
+
+.order-detail-page .total-price {
+    font-size: 22px;
+    font-weight: 800;
+    color: #234504;
+}
+
+.order-detail-page .badge {
+    font-size: 13px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-weight: 700;
+}
+
+.order-detail-page .order-section-head h4 {
+    margin: 0 0 14px;
+    font-size: 24px;
+    color: #213513;
+    font-weight: 700;
+}
+
+.order-detail-page .order-items-table,
+.order-detail-page .review-table {
+    margin-bottom: 0;
+}
+
+.order-detail-page .order-items-table thead th,
+.order-detail-page .review-table thead th {
+    border-bottom: 0;
+    background: #f2f8e8;
+    color: #4b6331;
+    font-weight: 700;
+    padding: 14px;
+}
+
+.order-detail-page .order-items-table tbody td,
+.order-detail-page .review-table tbody td {
+    padding: 14px;
+    vertical-align: middle;
+    border-color: #edf3e2;
+}
+
+.order-detail-page .order-item-thumb {
+    width: 62px;
+    height: 62px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid #dde8ca;
+    background: #fff;
+}
+
+.order-detail-page .order-item-name {
+    font-weight: 700;
+    color: #243817;
+}
+
+.order-detail-page .shipping-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.order-detail-page .shipping-item {
+    background: #f8fbf2;
+    border: 1px solid #e7f0d8;
+    border-radius: 12px;
+    padding: 12px 14px;
+    color: #304622;
+    font-weight: 500;
+}
+
+.order-detail-page .shipping-item span {
+    font-weight: 700;
+    color: #274015;
+    margin-right: 6px;
+}
+
+.order-detail-page .shipping-item.shipping-full {
+    grid-column: 1 / -1;
+}
+
+.order-detail-page .cancel-order-form .btn-danger {
+    min-width: 180px;
+    border-radius: 10px;
+    font-weight: 700;
+    box-shadow: 0 8px 18px rgba(189, 53, 53, 0.2);
+}
+
+.order-detail-page .review-btn {
+    min-width: 130px;
+    text-align: center;
+}
+
+@media (max-width: 991.98px) {
+    .order-detail-page .order-summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 767.98px) {
+    .order-detail-page .order-detail-card {
+        border-radius: 14px;
+        padding: 16px;
+    }
+
+    .order-detail-page .order-detail-header h3 {
+        font-size: 23px;
+    }
+
+    .order-detail-page .order-summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .order-detail-page .shipping-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .order-detail-page .order-items-table thead th,
+    .order-detail-page .review-table thead th,
+    .order-detail-page .order-items-table tbody td,
+    .order-detail-page .review-table tbody td {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    .order-detail-page .order-item-thumb {
+        width: 52px;
+        height: 52px;
+    }
+
+    .order-detail-page .total-price {
+        font-size: 20px;
+    }
+}
+
