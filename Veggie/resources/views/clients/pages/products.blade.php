@@ -52,7 +52,7 @@
                             <ul>
                                 @foreach ($categories as $category)
                                     <li>
-                                        <a href="javascript:void(0)" class="category-filter"
+                                        <a href="javascript:void(0)" class="category-filter {{ request('category_id') == $category->id ? 'active' : '' }}"
                                             data-id="{{ $category->id }}">{{ $category->name }} <span><i
                                                     class="fas fa-long-arrow-alt-right"></i></span></a>
                                     </li>
@@ -75,30 +75,36 @@
                         <div class="widget ltn__top-rated-product-widget">
                             <h4 class="ltn__widget-title ltn__widget-title-border">Sản phẩm nổi bật</h4>
                             <ul>
-                                <li>
-                                    <div class="top-rated-product-item clearfix">
-                                        <div class="top-rated-product-img">
-                                            <a href="product-details.html"><img src="img/product/1.png" alt="#"></a>
-                                        </div>
-                                        <div class="top-rated-product-info">
-                                            <div class="product-ratting">
-                                                @include('clients.components.include.rating', [
-                                                    'product' => $products->first(),
-                                                ])
-                                                <h6><a href="product-details.html">Mixel Solid Seat Cover</a></h6>
+                                @foreach($productsHightRate as $topProduct)
+                                    <li>
+                                        <div class="top-rated-product-item clearfix">
+                                            <div class="top-rated-product-img">
+                                                <a href="{{ route('product.detail', $topProduct->slug) }}">
+                                                    <img src="{{ $topProduct->image_url ?? asset('storage/uploads/products/default_product.webp') }}"
+                                                        alt="{{ $topProduct->name }}">
+                                                </a>
+                                            </div>
+                                            <div class="top-rated-product-info">
+                                                <div class="product-ratting">
+                                                    @include('clients.components.include.rating', [
+                                                        'product' => $topProduct,
+                                                    ])
+                                                </div>
+                                                <h6><a href="{{ route('product.detail', $topProduct->slug) }}">{{ $topProduct->name }}</a></h6>
                                                 <div class="product-price">
-                                                    <span>$49.00</span>
-                                                    <del>$65.00</del>
+                                                    <span>{{ number_format($topProduct->price, 0, ',', '.') }}VND</span>
                                                 </div>
                                             </div>
                                         </div>
-                                </li>
+                                    </li>
+                                @endforeach
+                            </ul>
                         </div>
                         <!-- Search Widget -->
                         <div class="widget ltn__search-widget">
                             <h4 class="ltn__widget-title ltn__widget-title-border">Tìm kiếm</h4>
-                            <form action="#">
-                                <input type="text" name="search" placeholder="Nhập ...">
+                            <form method="GET" action="{{ route('search') }}">
+                                <input type="text" name="keyword" placeholder="Nhập tên sản phẩm ...">
                                 <button type="submit"><i class="fas fa-search"></i></button>
                             </form>
                         </div>

@@ -85,7 +85,8 @@
     <!--Jquery toastr-->
     <!--Javascript-->
     <script src="{{ asset('assets/clients/js/custom.js') }}"></script>
-    <script src="https://www.paypal.com/sdk/js?client-id={{ env('PAYPAL_CLIENT_ID') }}&currency=USD"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id={{ config('services.paypal.client_id') }}&currency=USD"></script>
+    @include('clients.partials.chat_ai')
 </body>
 
 @stack('scripts')

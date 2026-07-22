@@ -8,7 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Admin Login</title>
+    <title>Đăng nhập Admin</title>
 
     <!-- Bootstrap -->
     <link href="{{ asset('assets/admin/vendors/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet">
@@ -20,7 +20,11 @@
     <link href="{{ asset('assets/admin/vendors/animate.css/animate.min.css') }}" rel="stylesheet">
 
     <!-- Custom Theme Style -->
-    <link href="{{ asset('assets/admin/build/css/custom.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/admin/build/css/custom.css') }}" rel="stylesheet">
+
+    <!-- Toastr CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
 <body class="login">
@@ -57,6 +61,31 @@
             </div>
         </div>
     </div>
+
+    <!-- jQuery -->
+    <script src="{{ asset('assets/admin/vendors/jquery/dist/jquery.min.js') }}"></script>
+    <!-- Toastr JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" crossorigin="anonymous"
+        referrerpolicy="no-referrer"></script>
+
+    @if (session('toastr'))
+        @php
+            $toast = session('toastr');
+            $toastType = in_array($toast['type'] ?? '', ['success', 'error', 'info', 'warning'], true)
+                ? $toast['type']
+                : 'info';
+        @endphp
+        <script>
+            toastr.options = {
+                closeButton: true,
+                progressBar: true,
+                timeOut: 5000,
+                extendedTimeOut: 1500,
+                positionClass: 'toast-top-right'
+            };
+            toastr["{{ $toastType }}"](@json($toast['message'] ?? ''));
+        </script>
+    @endif
 </body>
 
 </html>

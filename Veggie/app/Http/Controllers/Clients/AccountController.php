@@ -24,8 +24,8 @@ class AccountController extends Controller
     {
         $request->validate([
             'ltn_name' => 'required|string|max:255',
-            'ltn_phone' => 'required|string|max:20',
-            'ltn_address' => 'required|string|max:255',
+            'ltn_phone' => 'nullable|string|max:20',
+            'ltn_address' => 'nullable|string|max:255',
             'ltn_email' => 'required|email|max:255|unique:users,email,' . Auth::id(),
             'ltn_avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);

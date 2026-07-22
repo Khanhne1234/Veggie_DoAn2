@@ -18,13 +18,29 @@ class ProductController extends Controller
     {
         $categories = Category::with('products')->get();
         // Try to get in_stock products, fallback to all products
-        $products = Product::with('firstImage')->where('status', 'in_stock')->paginate(9);
+        $query = Product::with('firstImage')->where('status', 'in_stock');
+
+        if (request()->has('category_id') && !empty(request('category_id'))) {
+            $query->where('category_id', request('category_id'));
+        }
+
+        $products = $query->paginate(9);
+
+        $productsHightRate = Product::withAvg('reviews', 'rating')
+            ->with(['reviews', 'firstImage'])
+            ->orderBy('reviews_avg_rating', 'desc')
+            ->limit(2)
+            ->get();
 
         // Fallback if no in_stock products found
         if ($products->isEmpty() && $products->total() == 0) {
-            $products = Product::with('firstImage')->paginate(6);
+            $fallbackQuery = Product::with('firstImage');
+            if (request()->has('category_id') && !empty(request('category_id'))) {
+                $fallbackQuery->where('category_id', request('category_id'));
+            }
+            $products = $fallbackQuery->paginate(6);
         }
-        return view('clients.pages.products', compact('categories', 'products'));
+        return view('clients.pages.products', compact('categories', 'products', 'productsHightRate'));
     }
     public function filter(Request $request)
     {

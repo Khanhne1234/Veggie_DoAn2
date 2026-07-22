@@ -17,9 +17,9 @@
                                     <div class="ltn__shop-details-large-img">
                                         <div class="single-large-img">
                                             @forelse ($product->images as $image)
-                                                <a href="{{ asset('storage/uploads/products/' . $image->image) }}"
+                                                <a href="{{ asset('storage/' . $image->image) }}"
                                                     data-rel="lightcase:myCollection">
-                                                    <img src="{{ asset('storage/uploads/products/' . $image->image) }}"
+                                                    <img src="{{ asset('storage/' . $image->image) }}"
                                                         alt="{{ $product->name }}">
                                                 </a>
                                             @empty
@@ -150,7 +150,7 @@
                                         </div>
                                     </div>
                                     <!-- comment-reply -->
-                                    @if (Auth::check() && $hasReviewed && !$hasReviewed)
+                                    @if (Auth::check() && $hasPurchased && !$hasReviewed)
                                         <div class="ltn__comment-reply-area ltn__form-box mb-30">
                                             <form id="review-form" data-product-id="{{ $product->id }}">
                                                 <h4 class="title-2">Thêm đánh giá</h4>

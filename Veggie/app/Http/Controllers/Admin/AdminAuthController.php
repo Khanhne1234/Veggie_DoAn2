@@ -10,9 +10,6 @@ class AdminAuthController extends Controller
 {
     public function ShowLoginForm(Request $request)
     {
-        Auth::guard('admin')->logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
         return view('admin.pages.login');
     }
     public function Login(Request $request)
@@ -40,6 +37,16 @@ class AdminAuthController extends Controller
         return back()->withInput()->with('toastr', [
             'type' => 'error',
             'message' => 'Email hoặc mật khẩu không đúng',
+        ]);
+    }
+    public function Logout(Request $request)
+    {
+        Auth::guard('admin')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect()->route('admin.login')->with('toastr', [
+            'type' => 'success',
+            'message' => 'Đăng xuất admin thành công',
         ]);
     }
 }

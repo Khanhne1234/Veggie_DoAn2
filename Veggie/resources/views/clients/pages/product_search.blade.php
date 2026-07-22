@@ -62,7 +62,7 @@
                                     @empty
                                         <div class="col-12">
                                             <div class="alert alert-info text-center">
-                                                <p>Không tìm thấy sản phẩm nào phù hợp với bộ lọc của bạn.</p>
+                                                <p>Không tìm thấy sản phẩm nào phù hợp với từ khóa của bạn.</p>
                                             </div>
                                         </div>
                                     @endforelse

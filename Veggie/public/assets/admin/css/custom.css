@@ -1,0 +1,275 @@
+.custom-file-upload {
+    display: inline-block;
+    border: 1px solid #ccc;
+    padding: 6px 12px;
+    background-color: #1c71c7;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.image-preview {
+    margin-top: 10px;
+    max-width: 200px;
+    max-height: 200px;
+    border: 2px solid #1c71c7;
+    border-radius: 5px;
+}
+
+#category-image,
+#product-images {
+    display: none;
+}
+
+.btn-update-category {
+    color: green !important;
+}
+
+.btn-delete-category {
+    color: red !important;
+}
+
+.category-image {
+    display: none;
+}
+
+.btn-update-product {
+    color: green !important;
+}
+
+.btn-delete-product {
+    color: red !important;
+}
+
+.product-image {
+    display: none;
+    ;
+}
+
+.image-preview-listproduct {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.custom-badge {
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.avatar-view {
+    width: 220px;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.custom-message-top {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    word-break: break-word;
+    white-space: unset !important;
+}
+
+/* ==========================================
+   Modern Table Design Styles
+   ========================================== */
+
+/* Modernized x_panel container cards */
+.x_panel {
+    border: 1px solid #f1f5f9 !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+    border-radius: 12px !important;
+    background: #ffffff !important;
+    padding: 20px !important;
+    margin-bottom: 24px !important;
+}
+
+.x_title {
+    border-bottom: 1px solid #f1f5f9 !important;
+    padding: 0 0 14px 0 !important;
+    margin-bottom: 20px !important;
+}
+
+.x_title h2 {
+    font-size: 1.15rem !important;
+    font-weight: 700 !important;
+    color: #1e293b !important;
+    font-family: "Inter", "Helvetica Neue", Roboto, Arial, sans-serif;
+}
+
+/* Modern Clean Tables */
+.x_panel table.table,
+.x_panel table.table-bordered,
+.x_panel table.table-striped {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    width: 100% !important;
+    margin-bottom: 1rem;
+    color: #334155 !important;
+    background-color: #ffffff !important;
+    border-radius: 10px !important;
+    overflow: hidden;
+    border: 1px solid #e2e8f0 !important;
+}
+
+/* Remove default heavy vertical and horizontal borders */
+.x_panel .table-bordered th,
+.x_panel .table-bordered td,
+.x_panel .table-striped th,
+.x_panel .table-striped td,
+.x_panel .table th,
+.x_panel .table td {
+    border: none !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    padding: 14px 16px !important;
+    font-size: 0.875rem !important;
+    vertical-align: middle !important;
+    transition: background-color 0.2s ease;
+}
+
+/* Table Header Styles */
+.x_panel .table thead th {
+    background-color: #f8fafc !important;
+    color: #475569 !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    font-size: 0.75rem !important;
+    letter-spacing: 0.05em !important;
+    border-bottom: 2px solid #e2e8f0 !important;
+    border-top: none !important;
+    padding: 16px !important;
+}
+
+/* Striped and Hover Rows */
+.x_panel .table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f8fafc !important;
+}
+
+.x_panel .table-striped tbody tr:nth-of-type(even) {
+    background-color: #ffffff !important;
+}
+
+.x_panel .table tbody tr:hover {
+    background-color: #f1f5f9 !important;
+}
+
+.x_panel .table tbody tr:last-child td {
+    border-bottom: none !important;
+}
+
+/* Status Badges */
+.x_panel .badge,
+.x_panel .custom-badge {
+    padding: 6px 12px !important;
+    font-weight: 600 !important;
+    font-size: 0.72rem !important;
+    border-radius: 9999px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.03em !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+}
+
+/* Premium Softer Colors for Badges */
+.x_panel .bg-warning,
+.x_panel .badge-warning {
+    background-color: #fef3c7 !important;
+    color: #d97706 !important;
+    border-color: #fde68a !important;
+}
+
+.x_panel .bg-danger,
+.x_panel .badge-danger {
+    background-color: #fee2e2 !important;
+    color: #dc2626 !important;
+    border-color: #fecaca !important;
+}
+
+.x_panel .bg-info,
+.x_panel .badge-info {
+    background-color: #e0f2fe !important;
+    color: #0284c7 !important;
+    border-color: #bae6fd !important;
+}
+
+.x_panel .bg-success,
+.x_panel .badge-success {
+    background-color: #dcfce7 !important;
+    color: #16a34a !important;
+    border-color: #bbf7d0 !important;
+}
+
+.x_panel .bg-primary,
+.x_panel .badge-primary {
+    background-color: #dbeafe !important;
+    color: #2563eb !important;
+    border-color: #bfdbfe !important;
+}
+
+/* Action Buttons inside Tables */
+.x_panel .table .btn {
+    padding: 8px 14px !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+    border: 1px solid transparent !important;
+}
+
+.x_panel .table .btn-primary {
+    background-color: #2563eb !important;
+    border-color: #2563eb !important;
+    color: #ffffff !important;
+}
+
+.x_panel .table .btn-primary:hover {
+    background-color: #1d4ed8 !important;
+    border-color: #1d4ed8 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2), 0 2px 4px -1px rgba(37, 99, 235, 0.1) !important;
+}
+
+.x_panel .table .btn-info {
+    background-color: #0ea5e9 !important;
+    border-color: #0ea5e9 !important;
+    color: #ffffff !important;
+}
+
+.x_panel .table .btn-info:hover {
+    background-color: #0284c7 !important;
+    border-color: #0284c7 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 6px -1px rgba(14, 165, 233, 0.2), 0 2px 4px -1px rgba(14, 165, 233, 0.1) !important;
+}
+
+/* Table Thumbnail Images */
+.x_panel .table img {
+    border-radius: 8px !important;
+    object-fit: cover !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04) !important;
+    border: 1px solid #e2e8f0 !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.x_panel .table img:hover {
+    transform: scale(1.08) !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* DataTables pagination and info styling alignment */
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_paginate {
+    padding-top: 15px !important;
+    color: #475569 !important;
+    font-size: 0.85rem !important;
+}

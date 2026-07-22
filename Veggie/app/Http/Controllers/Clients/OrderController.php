@@ -34,4 +34,18 @@ class OrderController extends Controller
             'message' => 'Đơn hàng đã được hủy thành công.'
         ]);
     }
+    public function receivedOrder($id)
+    {
+        $order = Order::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->where('status', 'processing')
+            ->firstOrFail();
+
+        //update order status to completed
+        $order->update(['status' => 'completed']);
+        return redirect()->back()->with('toastr', [
+            'type' => 'success',
+            'message' => 'Xác nhận đơn hàng thành công.'
+        ]);
+    }
 }

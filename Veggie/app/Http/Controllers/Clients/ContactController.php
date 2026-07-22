@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Clients;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Contact;
+use App\Models\Notification;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Auth;
 
 class ContactController extends Controller
 {
@@ -50,12 +52,29 @@ class ContactController extends Controller
 
             return redirect()->back()->with('error', $message);
         }
+        $user = Auth::user();
+        if (Auth::check()) {
+            Notification::create([
+                'user_id' => $user->id,
+                'type' => 'contact',
+                'message' => 'Có liên hệ mới từ ' . $request->email,
+                'link' => '/contact',
+                'is_read' => false,
+            ]);
+        } else {
+            Notification::create([
+                'user_id' => null,
+                'type' => 'contact',
+                'message' => 'Có liên hệ mới từ ' . $request->email,
+                'link' => '/contact',
+                'is_read' => false,
+            ]);
+        }
 
         // nếu gửi thành công, trả về phản hồi phù hợp
         if ($request->ajax() || $request->wantsJson()) {
             return response('Liên hệ đã được gửi thành công!', 200);
         }
-
         return redirect()->back()->with('success', 'Liên hệ đã được gửi thành công!');
     }
 }

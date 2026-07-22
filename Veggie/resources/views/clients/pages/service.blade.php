@@ -28,10 +28,10 @@
                                 giúp bạn mua thực phẩm mỗi ngày một cách dễ dàng, tiết kiệm thời gian và an tâm hơn.</p>
                             <div class="list-item-with-icon">
                                 <ul>
-                                    <li><a href="{{ route('contact.index') }}">Giao hàng tận nơi linh hoạt</a></li>
-                                    <li><a href="{{ route('team') }}">Đội ngũ hỗ trợ tận tâm</a></li>
-                                    <li><a href="{{ route('service') }}">Kiểm soát chất lượng chặt chẽ</a></li>
-                                    <li><a href="{{ route('products.index') }}">Danh mục sản phẩm đa dạng</a></li>
+                                    <li><a href="javascript:void(0)">Giao hàng tận nơi linh hoạt</a></li>
+                                    <li><a href="javascript:void(0)">Đội ngũ hỗ trợ tận tâm</a></li>
+                                    <li><a href="javascript:void(0)">Kiểm soát chất lượng chặt chẽ</a></li>
+                                    <li><a href="javascript:void(0)">Danh mục sản phẩm đa dạng</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -56,11 +56,11 @@
                 <div class="col-lg-4 col-sm-6">
                     <div class="ltn__service-item-1">
                         <div class="service-item-img">
-                            <a href="{{ route('service') }}"><img src="{{ asset('assets/clients/img/service/1.jpg') }}"
+                            <a href="javascript:void(0)"><img src="{{ asset('assets/clients/img/service/1.jpg') }}"
                                     alt="#"></a>
                         </div>
                         <div class="service-item-brief">
-                            <h3><a href="{{ route('service') }}">Rau củ tươi theo ngày</a></h3>
+                            <h3><a href="javascript:void(0)">Rau củ tươi theo ngày</a></h3>
                             <p>Cung cấp rau củ sạch, cập nhật mỗi ngày từ nguồn trồng đạt tiêu chuẩn.</p>
                         </div>
                     </div>
@@ -68,11 +68,11 @@
                 <div class="col-lg-4 col-sm-6">
                     <div class="ltn__service-item-1">
                         <div class="service-item-img">
-                            <a href="{{ route('service') }}"><img src="{{ asset('assets/clients/img/service/2.jpg') }}"
+                            <a href="javascript:void(0)"><img src="{{ asset('assets/clients/img/service/2.jpg') }}"
                                     alt="#"></a>
                         </div>
                         <div class="service-item-brief">
-                            <h3><a href="{{ route('service') }}">Đóng gói bảo quản kỹ</a></h3>
+                            <h3><a href="javascript:void(0)">Đóng gói bảo quản kỹ</a></h3>
                             <p>Sản phẩm được phân loại và đóng gói cẩn thận để giữ độ tươi ngon khi vận chuyển.</p>
                         </div>
                     </div>
@@ -80,11 +80,11 @@
                 <div class="col-lg-4 col-sm-6">
                     <div class="ltn__service-item-1">
                         <div class="service-item-img">
-                            <a href="{{ route('service') }}"><img src="{{ asset('assets/clients/img/service/3.jpg') }}"
+                            <a href="javascript:void(0)"><img src="{{ asset('assets/clients/img/service/3.jpg') }}"
                                     alt="#"></a>
                         </div>
                         <div class="service-item-brief">
-                            <h3><a href="{{ route('service') }}">Giao nhanh trong ngày</a></h3>
+                            <h3><a href="javascript:void(0)">Giao nhanh trong ngày</a></h3>
                             <p>Hỗ trợ giao hàng nhanh giúp bạn chuẩn bị bữa ăn đúng giờ, không phải chờ đợi lâu.</p>
                         </div>
                     </div>
@@ -92,11 +92,11 @@
                 <div class="col-lg-4 col-sm-6">
                     <div class="ltn__service-item-1">
                         <div class="service-item-img">
-                            <a href="{{ route('service') }}"><img src="{{ asset('assets/clients/img/service/3.jpg') }}"
+                            <a href="javascript:void(0)"><img src="{{ asset('assets/clients/img/service/3.jpg') }}"
                                     alt="#"></a>
                         </div>
                         <div class="service-item-brief">
-                            <h3><a href="{{ route('service') }}">Tư vấn thực phẩm phù hợp</a></h3>
+                            <h3><a href="javascript:void(0)">Tư vấn thực phẩm phù hợp</a></h3>
                             <p>Gợi ý sản phẩm theo nhu cầu dinh dưỡng và khẩu vị cho từng thành viên trong gia đình.</p>
                         </div>
                     </div>
@@ -104,11 +104,11 @@
                 <div class="col-lg-4 col-sm-6">
                     <div class="ltn__service-item-1">
                         <div class="service-item-img">
-                            <a href="{{ route('service') }}"><img src="{{ asset('assets/clients/img/service/1.jpg') }}"
+                            <a href="javascript:void(0)"><img src="{{ asset('assets/clients/img/service/1.jpg') }}"
                                     alt="#"></a>
                         </div>
                         <div class="service-item-brief">
-                            <h3><a href="{{ route('service') }}">Ưu đãi thành viên định kỳ</a></h3>
+                            <h3><a href="javascript:void(0)">Ưu đãi thành viên định kỳ</a></h3>
                             <p>Nhiều chương trình khuyến mãi theo tuần giúp bạn tiết kiệm chi phí mua sắm thực phẩm.</p>
                         </div>
                     </div>
@@ -120,7 +120,7 @@
                                     alt="#"></a>
                         </div>
                         <div class="service-item-brief">
-                            <h3><a href="{{ route('service') }}">Hỗ trợ đổi trả minh bạch</a></h3>
+                            <h3><a href="javascript:void(0)">Hỗ trợ đổi trả minh bạch</a></h3>
                             <p>Chính sách đổi trả rõ ràng nếu sản phẩm không đạt chất lượng như cam kết.</p>
                         </div>
                     </div>

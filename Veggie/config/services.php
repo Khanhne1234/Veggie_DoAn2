@@ -34,5 +34,13 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    //PayPal Setting & API Credentials
+    'paypal' => [
+        'client_id' => env('PAYPAL_CLIENT_ID'),
+    ],
+    //Gemini AI API Key
+    'gemini' => [
+        'api_key' => env('GEMINI_API_KEY'),
+    ],
 
 ];

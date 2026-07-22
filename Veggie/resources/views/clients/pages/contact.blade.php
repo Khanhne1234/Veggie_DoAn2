@@ -24,7 +24,7 @@
                             <img src="{{ asset('assets/clients/img/icons/11.png') }}" alt="Icon Image">
                         </div>
                         <h3>Số điện thoại</h3>
-                        <p>+0123-456789</p>
+                        <p>0336102423</p>
                     </div>
                 </div>
                 <div class="col-lg-4">

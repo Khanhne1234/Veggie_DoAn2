@@ -90,7 +90,7 @@
                 <div class="col-lg-6 col-md-6">
                     <div class="ltn__banner-item">
                         <div class="ltn__banner-img">
-                            <a href="shop.html"><img src="{{ asset('assets/clients/img/banner/13.png') }}"
+                            <a href="javascript:void(0);"><img src="{{ asset('assets/clients/img/banner/13.png') }}"
                                     alt="Banner Image"></a>
                         </div>
                     </div>
@@ -100,7 +100,7 @@
                         <div class="col-lg-12">
                             <div class="ltn__banner-item">
                                 <div class="ltn__banner-img">
-                                    <a href="shop.html"><img src="{{ asset('assets/clients/img/banner/14.png') }}"
+                                    <a href="javascript:void(0);"><img src="{{ asset('assets/clients/img/banner/14.png') }}"
                                             alt="Banner Image"></a>
                                 </div>
                             </div>
@@ -108,7 +108,7 @@
                         <div class="col-lg-12">
                             <div class="ltn__banner-item">
                                 <div class="ltn__banner-img">
-                                    <a href="shop.html"><img src="{{ asset('assets/clients/img/banner/15.png') }}"
+                                    <a href="javascript:void(0);"><img src="{{ asset('assets/clients/img/banner/15.png') }}"
                                             alt="Banner Image"></a>
                                 </div>
                             </div>
@@ -136,12 +136,12 @@
                     <div class="col-12">
                         <div class="ltn__category-item ltn__category-item-3 text-center">
                             <div class="ltn__category-item-img">
-                                <a href="shop.html">
+                                <a href="{{ route('products.index', ['category_id' => $category->id]) }}">
                                     <img src="{{ $category->image_url }}" alt="{{ $category->name }}">
                                 </a>
                             </div>
                             <div class="ltn__category-item-name">
-                                <h5><a href="shop.html">{{ $category->name }}</a></h5>
+                                <h5><a href="{{ route('products.index', ['category_id' => $category->id]) }}">{{ $category->name }}</a></h5>
                                 <h6>({{ $category->products->count() }} sản phẩm)</h6>
                             </div>
                         </div>
@@ -235,51 +235,92 @@
     </div>
     <!-- PRODUCT TAB AREA END -->
 
-    <!-- COUNTER UP AREA START -->
-    <div class="ltn__counterup-area bg-image bg-overlay-theme-black-80 pt-115 pb-70"
-        data-bg="{{ asset('assets/clients/img/bg/5.jpg') }}">
+    <!-- PROMOTIONAL BANNER & FEATURE AREA START -->
+    <div class="ltn__promotional-feature-area pb-60">
         <div class="container">
-            <div class="row">
-                <div class="col-md-3 col-sm-6 align-self-center">
-                    <div class="ltn__counterup-item-3 text-color-white text-center">
-                        <div class="counter-icon"> <img src="{{ asset('assets/clients/img/icons/icon-img/2.png') }}"
-                                alt="#"> </div>
-                        <h1><span class="counter">733</span><span class="counterUp-icon">+</span> </h1>
-                        <h6>Khách hàng hoạt động</h6>
+            <!-- Promo Banner -->
+            <div class="row mb-50">
+                <div class="col-lg-12">
+                    <div class="ltn__banner-item ltn__banner-style-4 text-color-white bg-image"
+                        data-bg="{{ asset('assets/clients/img/bg/15.jpg') }}"
+                        style="background-size: cover; background-position: center; border-radius: 15px; overflow: hidden; position: relative;">
+                        <div class="ltn__banner-info-wrap bg-overlay-theme-black-60 pt-80 pb-80 pl-50 pr-50 text-center"
+                            style="position: relative; z-index: 1; backdrop-filter: blur(1px);">
+                            <h6 class="slide-sub-title ltn__secondary-color"
+                                style="color: #80b435; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px;">
+                                // Ưu đãi đặc biệt hôm nay //
+                            </h6>
+                            <h1 class="slide-title white-color mb-20"
+                                style="font-size: 2.2rem; font-weight: 800; line-height: 1.3; color: #fff;">
+                                Rau củ quả hữu cơ đạt chuẩn VietGAP <br> Giảm ngay 15% khi đặt hàng trực tuyến
+                            </h1>
+                            <p style="font-size: 1.05rem; max-width: 700px; margin: 0 auto 30px; opacity: 0.9;">
+                                Chúng tôi mang đến nguồn thực phẩm tươi sạch, không chất bảo quản, an toàn tuyệt đối cho sức khỏe gia đình bạn.
+                            </p>
+                            <div class="btn-wrapper">
+                                <a href="{{ route('products.index') }}" class="theme-btn-1 btn btn-effect-1 text-uppercase"
+                                    style="border-radius: 30px; padding: 15px 35px; font-weight: 600;">
+                                    Mua ngay
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-3 col-sm-6 align-self-center">
-                    <div class="ltn__counterup-item-3 text-color-white text-center">
-                        <div class="counter-icon"> <img src="{{ asset('assets/clients/img/icons/icon-img/3.png') }}"
-                                alt="#"> </div>
-                        <h1><span class="counter">33</span><span class="counterUp-letter">K</span><span
-                                class="counterUp-icon">+</span> </h1>
-                        <h6>Tách cà phê</h6>
+            </div>
+
+            <!-- Features Row -->
+            <div class="row justify-content-center">
+                <div class="col-lg-3 col-md-6 col-sm-6">
+                    <div class="ltn__feature-item ltn__feature-item-8 text-center" style="background: #ffffff; padding: 30px 20px; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); margin-bottom: 30px; border: 1px solid #f0f0f0; transition: all 0.3s ease; height: calc(100% - 30px);">
+                        <div class="ltn__feature-icon" style="margin-bottom: 15px;">
+                            <img src="{{ asset('assets/clients/img/icons/icon-img/21.png') }}" alt="#" style="max-height: 45px;">
+                        </div>
+                        <div class="ltn__feature-info">
+                            <h4 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; color: #071c1f;">Thực phẩm sạch</h4>
+                            <p style="font-size: 0.88rem; line-height: 1.5; color: #666; margin-bottom: 0;">100% tươi mới, an toàn tuyệt đối cho sức khỏe.</p>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-3 col-sm-6 align-self-center">
-                    <div class="ltn__counterup-item-3 text-color-white text-center">
-                        <div class="counter-icon"> <img src="{{ asset('assets/clients/img/icons/icon-img/4.png') }}"
-                                alt="#"> </div>
-                        <h1><span class="counter">100</span><span class="counterUp-icon">+</span> </h1>
-                        <h6>Nhận thưởng</h6>
+                <div class="col-lg-3 col-md-6 col-sm-6">
+                    <div class="ltn__feature-item ltn__feature-item-8 text-center" style="background: #ffffff; padding: 30px 20px; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); margin-bottom: 30px; border: 1px solid #f0f0f0; transition: all 0.3s ease; height: calc(100% - 30px);">
+                        <div class="ltn__feature-icon" style="margin-bottom: 15px;">
+                            <img src="{{ asset('assets/clients/img/icons/icon-img/22.png') }}" alt="#" style="max-height: 45px;">
+                        </div>
+                        <div class="ltn__feature-info">
+                            <h4 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; color: #071c1f;">Giao hàng siêu tốc</h4>
+                            <p style="font-size: 0.88rem; line-height: 1.5; color: #666; margin-bottom: 0;">Nhận hàng tươi ngon nhanh chóng trong 2 giờ.</p>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-3 col-sm-6 align-self-center">
-                    <div class="ltn__counterup-item-3 text-color-white text-center">
-                        <div class="counter-icon"> <img src="{{ asset('assets/clients/img/icons/icon-img/5.png') }}"
-                                alt="#"> </div>
-                        <h1><span class="counter">21</span><span class="counterUp-icon">+</span> </h1>
-                        <h6>Phủ khắp quốc gia</h6>
+                <div class="col-lg-3 col-md-6 col-sm-6">
+                    <div class="ltn__feature-item ltn__feature-item-8 text-center" style="background: #ffffff; padding: 30px 20px; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); margin-bottom: 30px; border: 1px solid #f0f0f0; transition: all 0.3s ease; height: calc(100% - 30px);">
+                        <div class="ltn__feature-icon" style="margin-bottom: 15px;">
+                            <img src="{{ asset('assets/clients/img/icons/icon-img/23.png') }}" alt="#" style="max-height: 45px;">
+                        </div>
+                        <div class="ltn__feature-info">
+                            <h4 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; color: #071c1f;">Thanh toán an toàn</h4>
+                            <p style="font-size: 0.88rem; line-height: 1.5; color: #666; margin-bottom: 0;">Hỗ trợ thanh toán COD và ví điện tử PayPal.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-6">
+                    <div class="ltn__feature-item ltn__feature-item-8 text-center" style="background: #ffffff; padding: 30px 20px; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); margin-bottom: 30px; border: 1px solid #f0f0f0; transition: all 0.3s ease; height: calc(100% - 30px);">
+                        <div class="ltn__feature-icon" style="margin-bottom: 15px;">
+                            <img src="{{ asset('assets/clients/img/icons/icon-img/2.png') }}" alt="#" style="max-height: 45px;">
+                        </div>
+                        <div class="ltn__feature-info">
+                            <h4 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; color: #071c1f;">Trợ lý Chat AI</h4>
+                            <p style="font-size: 0.88rem; line-height: 1.5; color: #666; margin-bottom: 0;">Tư vấn sản phẩm và giải đáp mọi thắc mắc 24/7.</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- COUNTER UP AREA END -->
+    <!-- PROMOTIONAL BANNER & FEATURE AREA END -->
 
     <!-- PRODUCT AREA START (product-item-3) -->
-    <div class="ltn__product-area ltn__product-gutter pt-115 pb-70">
+    <div class="ltn__product-area ltn__product-gutter pt-60 pb-70">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
@@ -347,11 +388,11 @@
                     <div class="call-to-action-inner call-to-action-inner-4 text-center">
                         <div class="section-title-area ltn__section-title-2">
                             <h6 class="section-subtitle ltn__secondary-color">// Bạn có thắc mắc gì //</h6>
-                            <h1 class="section-title white-color">897-876-987-90</h1>
+                            <h1 class="section-title white-color">0908383598</h1>
                         </div>
                         <div class="btn-wrapper">
-                            <a href="tel:+123456789" class="theme-btn-1 btn btn-effect-1">Gọi ngay</a>
-                            <a href="contact.html" class="btn btn-transparent btn-effect-4 white-color">Liên hệ
+                            <a href="tel:+84908383598" class="theme-btn-1 btn btn-effect-1">Gọi ngay</a>
+                            <a href="javascript:void(0)" class="btn btn-transparent btn-effect-4 white-color">Liên hệ
                                 với chúng tôi</a>
                         </div>
                     </div>

@@ -7,9 +7,10 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" href="images/favicon.ico" type="image/ico" />
+    <link rel="icon" href="{{ asset('assets/admin/images/favicon.ico ') }}" type="image/ico" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>Gentelella Alela!</title>
+    <title>@yield('title')</title>
 
     <!-- Bootstrap -->
     <link href="{{ asset('assets/admin/vendors/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet">
@@ -32,8 +33,30 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"
         crossorigin="anonymous" referrerpolicy="no-referrer" />
 
+
+    <!-- Datatables -->
+
+    @php
+        $dataTableRoutes = ['admin.categories.index', 'admin.products.index', 'admin.orders.index'];
+    @endphp
+    @if (in_array(Route::currentRouteName(), $dataTableRoutes))
+        <link href="{{ asset('assets/admin/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css') }}"
+            rel="stylesheet">
+        <link href="{{ asset('assets/admin/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css') }}"
+            rel="stylesheet">
+        <link
+            href="{{ asset('assets/admin/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css') }}"
+            rel="stylesheet">
+        <link href="{{ asset('assets/admin/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css') }}"
+            rel="stylesheet">
+        <link href="{{ asset('assets/admin/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css') }}"
+            rel="stylesheet">
+    @endif
+    <!-- Custom CSS -->
+    <link href="{{ asset('assets/admin/css/custom.css') }}" rel="stylesheet">
     <!-- Custom Theme Style -->
     <link href="{{ asset('assets/admin/build/css/custom.min.css') }}" rel="stylesheet">
+
 </head>
 
 <body class="nav-md">
@@ -45,8 +68,8 @@
             <main>
                 @yield('content')
             </main>
-
-            @include('admin.partials.footer')
+            {{--
+            @include('admin.partials.footer') --}}
         </div>
     </div>
 
@@ -92,25 +115,58 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" crossorigin="anonymous"
         referrerpolicy="no-referrer"></script>
 
-    <!-- Custom Theme Scripts -->
-    <script src="{{ asset('assets/admin/build/js/custom.min.js') }}"></script>
+    @if (in_array(Route::currentRouteName(), $dataTableRoutes))
+        <!-- Datatables -->
+        <script src="{{ asset('assets/admin/vendors/datatables.net/js/jquery.dataTables.min.js') }}"></script>
+        <script src="{{ asset('assets/admin/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
+        <script src="{{ asset('assets/admin/vendors/datatables.net-buttons/js/dataTables.buttons.min.js') }}"></script>
+        <script src="{{ asset('assets/admin/vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js') }}"></script>
+        <script src="{{ asset('assets/admin/vendors/datatables.net-buttons/js/buttons.flash.min.js') }}"></script>
+        <script src="{{ asset('assets/admin/vendors/datatables.net-buttons/js/buttons.html5.min.js') }}"></script>
+        <script src="{{ asset('assets/admin/vendors/datatables.net-buttons/js/buttons.print.min.js') }}"></script>
+        <script src="{{ asset('assets/admin/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js') }}"></script>
+        <script src="{{ asset('assets/admin/vendors/datatables.net-keytable/js/dataTables.keyTable.min.js') }}"></script>
+        <script src="{{ asset('assets/admin/vendors/datatables.net-responsive/js/dataTables.responsive.min.js') }}"></script>
+        <script src="{{ asset('assets/admin/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js') }}"></script>
+        <script src="{{ asset('assets/admin/vendors/datatables.net-scroller/js/dataTables.scroller.min.js') }}"></script>
+        <script src="{{ asset('assets/admin/vendors/jszip/dist/jszip.min.js') }}"></script>
+        <script src="{{ asset('assets/admin/vendors/pdfmake/build/pdfmake.min.js') }}"></script>
+        <script src="{{ asset('assets/admin/vendors/pdfmake/build/vfs_fonts.js') }}"></script>
+    @endif
+    <!-- CKEditor (phiên bản miễn phí 4.22.1) -->
+    <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
 
-    @if (session('toastr'))
-        @php
-            $toast = session('toastr');
-            $toastType = in_array($toast['type'] ?? '', ['success', 'error', 'info', 'warning'], true)
-                ? $toast['type']
-                : 'info';
-        @endphp
+    
+    <!-- Custom Theme Scripts -->
+    <script src="{{ asset('assets/admin/build/js/custom.js') }}"></script>
+    <script src="{{ asset('assets/admin/js/custom.js') }}"></script>
+
+    <script>
+        toastr.options = {
+            closeButton: true,
+            progressBar: true,
+            timeOut: 5000,
+            extendedTimeOut: 1500,
+            positionClass: 'toast-top-right'
+        };
+    </script>
+    @if (session('success'))
         <script>
-            toastr.options = {
-                closeButton: true,
-                progressBar: true,
-                timeOut: 5000,
-                extendedTimeOut: 1500,
-                positionClass: 'toast-top-right'
-            };
-            toastr["{{ $toastType }}"](@json($toast['message'] ?? ''));
+            toastr.success(@json(session('success')));
+        </script>
+    @endif
+
+    @if (session('error'))
+        <script>
+            toastr.error(@json(session('error')));
+        </script>
+    @endif
+
+    @if ($errors->any())
+        <script>
+            @foreach ($errors->all() as $error)
+                toastr.error(@json($error));
+            @endforeach
         </script>
     @endif
 

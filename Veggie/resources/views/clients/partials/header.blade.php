@@ -61,7 +61,15 @@
                             <div class="ltn__drop-menu user-menu">
                                 <ul>
                                     <li>
-                                        <a href="#"><i class="icon-user"></i></a>
+                                        @if (Auth::check())
+                                            <a href="{{ route('account') }}">
+                                                <img src="{{ Auth::user()->getAvatarUrl() }}" alt="Avatar"
+                                                    id="preview_image" class="profile_pic"
+                                                    style="width: 40px; height: 40px; border-radius: 50%;">
+                                            </a>
+                                        @else
+                                            <a href="#"><i class="icon-user"></i></a>
+                                        @endif
                                         <ul>
                                             @if (Auth::check())
                                                 <li><a href="{{ url('account') }}">Tài khoản</a></li>

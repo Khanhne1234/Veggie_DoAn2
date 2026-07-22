@@ -14,7 +14,7 @@
                             <div class="row">
                                 <div class="col-lg-6 col-12">
                                     <div class="modal-product-img">
-                                        <img src="{{ $product->image_url ?? ($product->firstImage?->image ? asset('storage/uploads/products/' . $product->firstImage->image) : asset('storage/uploads/products/default_product.webp')) }}"
+                                        <img src="{{ $product->image_url }}"
                                             alt="{{ $product->name }}">
                                     </div>
                                 </div>

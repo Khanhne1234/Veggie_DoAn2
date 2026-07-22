@@ -104,6 +104,14 @@
                         <button type="submit" class="btn btn-danger mt-3">Hủy đơn hàng</button>
                     </form>
                 @endif
+                @if ($order->status == 'processing')
+                    <form action="{{ route('orders.received', $order->id) }}" method="POST" class="received-order-form"
+                        onsubmit="return confirm('Đã nhận được đơn hàng');">
+                        @csrf
+                        @method('POST')
+                        <button type="submit" class="btn btn-success mt-3">Đã nhận được hàng</button>
+                    </form>
+                @endif
             </div>
 
             @if ($order->status == 'completed')

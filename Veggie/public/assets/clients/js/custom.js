@@ -136,16 +136,14 @@ $(document).ready(function () {
         let formData = new FormData(this); // Tạo FormData từ form
         let urlUpdate = $form.attr("action"); // Lấy URL từ thuộc tính action của form
         $.ajax({
-            Headers: {
-                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
-            },
-        });
-        $.ajax({
             url: urlUpdate,
             type: "POST",
             data: formData,
             processData: false, // Không xử lý dữ liệu
             contentType: false, // Không đặt contentType
+            headers: {
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
+            },
             beforeSend: function () {
                 $submitButton.text("Đang cập nhật...").attr("disabled", true);
             },
@@ -171,7 +169,22 @@ $(document).ready(function () {
                 }
             },
             error: function (xhr, status, error) {
-                toastr.error("Cập nhật thông tin thất bại!", "Lỗi", {
+                let message = "Cập nhật thông tin thất bại!";
+                if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+                    let errors = xhr.responseJSON.errors;
+                    let errorMessages = [];
+                    for (let key in errors) {
+                        if (errors.hasOwnProperty(key)) {
+                            errorMessages.push(errors[key].join("<br>"));
+                        }
+                    }
+                    if (errorMessages.length > 0) {
+                        message = errorMessages.join("<br>");
+                    }
+                } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                    message = xhr.responseJSON.message;
+                }
+                toastr.error(message, "Lỗi", {
                     timeOut: 5000,
                     extendedTimeOut: 2000,
                     closeButton: true,
@@ -441,9 +454,9 @@ $(document).ready(function () {
         slide: function (event, ui) {
             $(".amount").val(
                 formatVnd(ui.values[0]) +
-                    " - " +
-                    formatVnd(ui.values[1]) +
-                    " VNĐ",
+                " - " +
+                formatVnd(ui.values[1]) +
+                " VNĐ",
             );
         },
         change: function (event, ui) {
@@ -453,9 +466,9 @@ $(document).ready(function () {
     });
     $(".amount").val(
         formatVnd($(".slider-range").slider("values", 0)) +
-            " - " +
-            formatVnd($(".slider-range").slider("values", 1)) +
-            " VNĐ",
+        " - " +
+        formatVnd($(".slider-range").slider("values", 1)) +
+        " VNĐ",
     );
 
     /**********************************
@@ -752,58 +765,60 @@ $(document).ready(function () {
         }
     });
 
-    var totalPriceVnd = Number($(".totalPrice_Checkout").data("total-vnd"));
-    if (!Number.isFinite(totalPriceVnd)) {
-        totalPriceVnd = 0;
-    }
+    if ($("#paypal-button-container").length) {
+        var totalPriceVnd = Number($(".totalPrice_Checkout").data("total-vnd"));
+        if (!Number.isFinite(totalPriceVnd)) {
+            totalPriceVnd = 0;
+        }
 
-    paypal
-        .Buttons({
-            createOrder: function (data, actions) {
-                return actions.order.create({
-                    purchase_units: [
-                        {
-                            amount: {
-                                value: (totalPriceVnd / 23000).toFixed(2), // Tổng số tiền cần thanh toán
-                                currency_code: "USD", // Đơn vị tiền tệ
+        paypal
+            .Buttons({
+                createOrder: function (data, actions) {
+                    return actions.order.create({
+                        purchase_units: [
+                            {
+                                amount: {
+                                    value: (totalPriceVnd / 23000).toFixed(2), // Tổng số tiền cần thanh toán
+                                    currency_code: "USD", // Đơn vị tiền tệ
+                                },
                             },
-                        },
-                    ],
-                });
-            },
-            onApprove: function (data, actions) {
-                return actions.order.capture().then(function (details) {
-                    // Gửi thông tin đơn hàng về server để xử lý
-                    fetch("/checkout/paypal", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
-                                "content",
-                            ),
-                        },
-                        body: JSON.stringify({
-                            orderID: data.orderID,
-                            payerID: data.payerID,
-                            transactionID: details.id,
-                            amount: details.purchase_units[0].amount.value,
-                            address_id: $("#list_address").val(),
-                            paymentDetails: details,
-                        }),
-                    })
-                        .then((response) => response.json())
-                        .then((data) => {
-                            if (data.success) {
-                                toastr.success(data.message, "Thành công");
-                                window.location.href = "/account"; // Chuyển hướng đến trang lịch sử đơn hàng
-                            } else {
-                                toastr.error(data.message, "Lỗi", {});
-                            }
-                        });
-                });
-            },
-        })
-        .render("#paypal-button-container");
+                        ],
+                    });
+                },
+                onApprove: function (data, actions) {
+                    return actions.order.capture().then(function (details) {
+                        // Gửi thông tin đơn hàng về server để xử lý
+                        fetch("/checkout/paypal", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                    "content",
+                                ),
+                            },
+                            body: JSON.stringify({
+                                orderID: data.orderID,
+                                payerID: data.payerID,
+                                transactionID: details.id,
+                                amount: details.purchase_units[0].amount.value,
+                                address_id: $("#list_address").val(),
+                                paymentDetails: details,
+                            }),
+                        })
+                            .then((response) => response.json())
+                            .then((data) => {
+                                if (data.success) {
+                                    toastr.success(data.message, "Thành công");
+                                    window.location.href = "/account"; // Chuyển hướng đến trang lịch sử đơn hàng
+                                } else {
+                                    toastr.error(data.message, "Lỗi", {});
+                                }
+                            });
+                    });
+                },
+            })
+            .render("#paypal-button-container");
+    }
 
     /**********************************
      * * Handle Rating Product

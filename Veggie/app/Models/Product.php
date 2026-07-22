@@ -30,9 +30,13 @@ class Product extends Model
     }
     public function getImageUrlAttribute()
     {
-        return $this->firstImage?->image
-            ? asset('storage/uploads/products/' . $this->firstImage->image)
-            : asset('storage/uploads/products/default_product.webp');
+        $imagePath = $this->firstImage?->image;
+
+        if (!$imagePath || $imagePath === 'default_product.webp') {
+            return asset('storage/uploads/products/default_product.webp');
+        }
+
+        return asset('storage/' . $imagePath);
     }
     public function reviews()
     {
@@ -42,5 +46,9 @@ class Product extends Model
     public function getAverageRatingAttribute()
     {
         return $this->reviews()->avg('rating') ?? 0;
+    }
+    public function oderItems()
+    {
+        return $this->hasMany(OrderItem::class);
     }
 }

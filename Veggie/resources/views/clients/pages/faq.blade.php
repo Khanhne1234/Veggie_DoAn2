@@ -117,9 +117,9 @@
                         <div class="need-support text-center mt-100">
                             <h2>Bạn vẫn cần hỗ trợ? Liên hệ đội ngũ chăm sóc khách hàng:</h2>
                             <div class="btn-wrapper mb-30">
-                                <a href="contact.html" class="theme-btn-1 btn">Liên hệ ngay</a>
+                                <a href="javascript:void(0)" class="theme-btn-1 btn">Liên hệ ngay</a>
                             </div>
-                            <h3><i class="fas fa-phone"></i> +0123-456-789</h3>
+                            <h3><i class="fas fa-phone"></i> 0336102423</h3>
                         </div>
                     </div>
                 </div>
@@ -139,7 +139,7 @@
                         </div>
                         <!-- Banner Widget -->
                         <div class="widget ltn__banner-widget">
-                            <a href="shop.html"><img src="{{ asset('assets/clients/img/banner/banner-3.jpg') }}" alt="Banner Image"></a>
+                            <a href="javascript:void(0);"><img src="{{ asset('assets/clients/img/banner/banner-3.jpg') }}" alt="Banner Image"></a>
                         </div>
 
                     </aside>

@@ -11,6 +11,7 @@ use App\Models\ShippingAddress;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\Notification;
 
 class CheckoutController extends Controller
 {
@@ -94,6 +95,15 @@ class CheckoutController extends Controller
             //Delete product in cart when order
             CartItem::where('user_id', $user->id)->delete();
             DB::commit();
+
+            Notification::create([
+                'user_id' => $user->id,
+                'type' => 'order',
+                'message' => 'Có đơn hàng mới từ ' . $user->email . ' vào lúc ' . now()->format('d/m/Y'),
+                'link' => '/orders',
+                'is_read' => false,
+            ]);
+
             return redirect()->route('account')->with('toastr', [
                 'type' => 'success',
                 'message' => 'Đặt hàng thành công! Vui lòng kiểm tra email để biết chi tiết đơn hàng.'

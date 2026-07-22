@@ -14,7 +14,7 @@
                                 <tbody>
 
                                     @forelse ($wishlist as $item)
-                                        <tr>
+                                        <tr style="vertical-align: middle;">
                                             <td class="wishlist-product-remove" data-id="{{ $item->product->id }}">
                                                 <button class="ltn__utilize-closecla">×</button>
                                             </td>

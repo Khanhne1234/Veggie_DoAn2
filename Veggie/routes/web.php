@@ -14,6 +14,7 @@ use App\Http\Controllers\Clients\ContactController;
 use App\Http\Controllers\Clients\ReviewController;
 use App\Http\Controllers\Clients\SearchController;
 use App\Http\Controllers\Clients\ResetPasswordController;
+use App\Http\Controllers\Clients\ChatController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -55,37 +56,37 @@ Route::middleware(RedirectIfNotAuthenticated::class)->group(function () {
     Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
     // Các route khác dành cho người dùng đã đăng nhập
     Route::prefix('account')->group(function () {
-        Route::get('/', [AccountController::class,'index'])->name('account');
-        Route::put('/update', [AccountController::class,'update'])->name('account.update');
+        Route::get('/', [AccountController::class, 'index'])->name('account');
+        Route::put('/update', [AccountController::class, 'update'])->name('account.update');
 
         //change password
-        Route::get('/change-password', [AccountController::class,'showChangePasswordForm'])->name('account.change-password');
-        Route::post('/change-password', [AccountController::class,'changePassword'])->name('account.post-change-password');
+        Route::get('/change-password', [AccountController::class, 'showChangePasswordForm'])->name('account.change-password');
+        Route::post('/change-password', [AccountController::class, 'changePassword'])->name('account.post-change-password');
 
         //address
-        Route::post('/addresses', [AccountController::class,'addAddress'])->name('account.address.add');
-        Route::put('/addresses/{id}', [AccountController::class,'updateAddress'])->name('account.address.update');
-        Route::delete('/addresses/{id}', [AccountController::class,'deleteAddress'])->name('account.address.delete');
-
+        Route::post('/addresses', [AccountController::class, 'addAddress'])->name('account.address.add');
+        Route::put('/addresses/{id}', [AccountController::class, 'updateAddress'])->name('account.address.update');
+        Route::delete('/addresses/{id}', [AccountController::class, 'deleteAddress'])->name('account.address.delete');
     });
-    Route::get('/checkout',[CheckoutController::class,'index'])->name('checkout');
-    Route::get('/checkout/get-address',[CheckoutController::class,'getAddress'])->name('checkout.get-address');
-    Route::post('/checkout',[CheckoutController::class,'placeOrder'])->name('checkout.placeOrder');
-    Route::post('/checkout/paypal',[CheckoutController::class,'placeOrderPaypal'])->name('checkout.placeOrderPaypal');
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
+    Route::get('/checkout/get-address', [CheckoutController::class, 'getAddress'])->name('checkout.get-address');
+    Route::post('/checkout', [CheckoutController::class, 'placeOrder'])->name('checkout.placeOrder');
+    Route::post('/checkout/paypal', [CheckoutController::class, 'placeOrderPaypal'])->name('checkout.placeOrderPaypal');
     //Order
-    Route::get('/order/{id}',[OrderController::class,'ShowOrders'])->name('orders.show');
-    Route::post('/order/{id}/cancel',[OrderController::class,'cancelOrder'])->name('orders.cancel');
+    Route::get('/order/{id}', [OrderController::class, 'ShowOrders'])->name('orders.show');
+    Route::post('/order/{id}/received', [OrderController::class, 'receivedOrder'])->name('orders.received');
+    Route::post('/order/{id}/cancel', [OrderController::class, 'cancelOrder'])->name('orders.cancel');
     //Rating
-    Route::post('/review',[ReviewController::class,'createReview'])->name('review.store');
-    Route::get('/review/{product}',[ReviewController::class,'index'])->name('review.index');
+    Route::post('/review', [ReviewController::class, 'createReview'])->name('review.store');
+    Route::get('/review/{product}', [ReviewController::class, 'index'])->name('review.index');
     //Wishlist
-    Route::get('/wishlist',[WishlistController::class,'index'])->name('wishlist');
-    Route::post('/wishlist/add',[WishlistController::class,'addToWishlist'])->name('wishlist.add');
-    Route::post('/wishlist/remove',[WishlistController::class,'removeFromWishlist'])->name('wishlist.remove');
+    Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist');
+    Route::post('/wishlist/add', [WishlistController::class, 'addToWishlist'])->name('wishlist.add');
+    Route::post('/wishlist/remove', [WishlistController::class, 'removeFromWishlist'])->name('wishlist.remove');
 });
 
-Route::get('/products',[ProductController::class,'index'])->name('products.index');
-Route::get('/products/filter',[ProductController::class,'filter'])->name('products.filter');
+Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+Route::get('/products/filter', [ProductController::class, 'filter'])->name('products.filter');
 //Detail product
 Route::get('/product/{slug}', [ProductController::class, 'detail'])->name('product.detail');
 
@@ -108,4 +109,8 @@ Route::post('/contact', [ContactController::class, 'sendContact'])->name('contac
 //Search
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 
-require __DIR__.'/admin.php';
+//Chat AI
+Route::get('/chat/history', [ChatController::class, 'getHistory'])->name('chat.history');
+Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
+
+require __DIR__ . '/admin.php';
