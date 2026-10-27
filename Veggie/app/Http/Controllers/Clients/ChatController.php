@@ -9,6 +9,7 @@ use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class ChatController extends Controller
 {
@@ -45,7 +46,7 @@ class ChatController extends Controller
     public function sendMessage(Request $request)
     {
         $request->validate([
-            'message' => 'required|string',
+            'message' => 'required|string|max:1000',
             'guest_token' => 'nullable|string|max:100'
         ]);
 
@@ -62,7 +63,7 @@ class ChatController extends Controller
         ]);
 
         // 2. Generate bot response via Gemini API
-        $botReplyText = $this->callGeminiApi($userText, $userId, $guestToken);
+        $botReplyText = $this->callGeminiApi($userText, $userId, $guestToken, $userMessage->id);
 
         // 3. Save bot response
         $botMessage = ChatMessage::create([
@@ -82,7 +83,12 @@ class ChatController extends Controller
     /**
      * Call Gemini API with product context from database.
      */
-    private function callGeminiApi(string $userText, ?int $userId, ?string $guestToken): string
+    private function callGeminiApi(
+        string $userText,
+        ?int $userId,
+        ?string $guestToken,
+        ?int $excludeMessageId = null
+    ): string
     {
         $apiKey = config('services.gemini.api_key');
 
@@ -95,7 +101,7 @@ class ChatController extends Controller
             $productContext = $this->buildProductContext($userText);
 
             // Build conversation history for context (last 10 messages)
-            $chatHistory = $this->getChatHistory($userId, $guestToken, 10);
+            $chatHistory = $this->getChatHistory($userId, $guestToken, 10, $excludeMessageId);
 
             // System instruction for the bot
             $systemInstruction = "Bạn là trợ lý bán hàng AI của cửa hàng Veggie – chuyên cung cấp rau củ quả, thịt, cá và nông sản hữu cơ chất lượng cao.\n\n"
@@ -129,8 +135,10 @@ class ChatController extends Controller
             ];
 
             // Call Gemini API
-            $response = Http::timeout(45)->post(
-                "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={$apiKey}",
+            $response = Http::withHeaders([
+                'x-goog-api-key' => $apiKey,
+            ])->connectTimeout(3)->timeout(10)->post(
+                'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent',
                 [
                     'system_instruction' => [
                         'parts' => [['text' => $systemInstruction]]
@@ -158,7 +166,6 @@ class ChatController extends Controller
             ]);
 
             return $this->fallbackReply($userText);
-
         } catch (\Exception $e) {
             Log::error('Gemini API call failed', [
                 'error' => $e->getMessage()
@@ -204,28 +211,33 @@ class ChatController extends Controller
     /**
      * Get recent chat history for conversation context.
      */
-    private function getChatHistory(?int $userId, ?string $guestToken, int $limit = 10)
+    private function getChatHistory(
+        ?int $userId,
+        ?string $guestToken,
+        int $limit = 10,
+        ?int $excludeMessageId = null
+    )
     {
+        $query = ChatMessage::query();
+
         if ($userId) {
-            return ChatMessage::where('user_id', $userId)
-                ->orderBy('created_at', 'desc')
-                ->limit($limit)
-                ->get()
-                ->reverse()
-                ->values();
+            $query->where('user_id', $userId);
+        } elseif ($guestToken) {
+            $query->where('guest_token', $guestToken)
+                ->whereNull('user_id');
+        } else {
+            return collect();
         }
 
-        if ($guestToken) {
-            return ChatMessage::where('guest_token', $guestToken)
-                ->whereNull('user_id')
-                ->orderBy('created_at', 'desc')
-                ->limit($limit)
-                ->get()
-                ->reverse()
-                ->values();
+        if ($excludeMessageId) {
+            $query->where('id', '!=', $excludeMessageId);
         }
 
-        return collect();
+        return $query->orderBy('created_at', 'desc')
+            ->limit($limit)
+            ->get()
+            ->reverse()
+            ->values();
     }
 
     /**
@@ -233,13 +245,53 @@ class ChatController extends Controller
      */
     private function fallbackReply(string $userText): string
     {
-        $text = mb_strtolower($userText, 'UTF-8');
+        $text = Str::lower(Str::ascii($userText));
 
-        if (str_contains($text, 'xin chào') || str_contains($text, 'hello') || str_contains($text, 'hi') || str_contains($text, 'chào')) {
+        if (preg_match('/\b(xin chao|chao|hello|hi)\b/u', $text)) {
             return 'Xin chào! Chúc bạn một ngày tốt lành. Tôi có thể hỗ trợ gì cho bạn về các sản phẩm rau củ quả hữu cơ của Veggie? 🥬';
         }
 
-        if (str_contains($text, 'giá') || str_contains($text, 'bao nhiêu') || str_contains($text, 'tiền')) {
+        if ($this->isGeneralSupportQuestion($text)) {
+            return "Mình có thể hỗ trợ bạn về:\n"
+                . "• Sản phẩm, giá và số lượng còn lại\n"
+                . "• Giao hàng và phí vận chuyển\n"
+                . "• Khuyến mãi\n"
+                . "• Cách đặt hàng và thanh toán\n"
+                . "Bạn muốn tìm hiểu nội dung nào trước? 🌿";
+        }
+
+        if (str_contains($text, 'thanh toan') || str_contains($text, 'paypal')) {
+            return 'Veggie hiện hỗ trợ thanh toán khi nhận hàng (COD) và thanh toán trực tuyến qua PayPal nếu phương thức này hiển thị ở bước thanh toán. Bạn chỉ cần thêm sản phẩm vào giỏ, nhập địa chỉ nhận hàng rồi chọn phương thức thanh toán phù hợp nhé! 💳';
+        }
+
+        if (str_contains($text, 'dat hang') || str_contains($text, 'mua hang') || str_contains($text, 'don hang')) {
+            return 'Để đặt hàng, bạn hãy thêm sản phẩm vào giỏ hàng, mở Giỏ hàng, kiểm tra số lượng, nhập địa chỉ nhận hàng và bấm Đặt hàng. Sau đó chọn phương thức thanh toán để hoàn tất nhé! 🛒';
+        }
+
+        if (str_contains($text, 'ship') || str_contains($text, 'giao hang') || str_contains($text, 'van chuyen')) {
+            return 'Veggie giao hàng nhanh nội thành trong vòng 2 giờ. Phí ship 15.000 VNĐ, miễn phí cho đơn từ 300.000 VNĐ! 🚚';
+        }
+
+        if (str_contains($text, 'khuyen mai') || str_contains($text, 'uu dai') || str_contains($text, 'giam gia')) {
+            return 'Bạn có thể hỏi mình tên sản phẩm hoặc xem mục Khuyến mãi trên cửa hàng để biết ưu đãi hiện có nhé! 🎁';
+        }
+
+        $matchingProducts = $this->findMatchingProducts($userText);
+
+        if ($matchingProducts->isNotEmpty()) {
+            $reply = "Mình tìm thấy các sản phẩm phù hợp:\n";
+
+            foreach ($matchingProducts as $product) {
+                $reply .= "• {$product->name}: "
+                    . number_format($product->price, 0, ',', '.')
+                    . ' VNĐ/' . ($product->unit ?? 'sản phẩm')
+                    . " (còn {$product->stock})\n";
+            }
+
+            return trim($reply) . "\nBạn muốn mình tư vấn thêm sản phẩm nào? 🌿";
+        }
+
+        if (str_contains($text, 'gia') || str_contains($text, 'bao nhieu') || str_contains($text, 'tien')) {
             $products = Product::where('status', 'in_stock')->take(3)->get();
             if ($products->count() > 0) {
                 $reply = "Dưới đây là một số sản phẩm tiêu biểu:\n";
@@ -251,10 +303,69 @@ class ChatController extends Controller
             }
         }
 
-        if (str_contains($text, 'ship') || str_contains($text, 'giao hàng') || str_contains($text, 'vận chuyển')) {
-            return 'Veggie giao hàng nhanh nội thành trong vòng 2 giờ. Phí ship 15.000 VNĐ, miễn phí cho đơn từ 300.000 VNĐ! 🚚';
-        }
-
         return 'Cảm ơn bạn đã liên hệ Veggie! Hiện tại hệ thống AI đang bảo trì, vui lòng thử lại sau hoặc gọi Hotline: 1900-VEGGIE nhé! 💚';
     }
+
+    /**
+     * Detect broad capability questions before matching product keywords.
+     */
+    private function isGeneralSupportQuestion(string $text): bool
+    {
+        return str_contains($text, 'thong tin gi')
+            || str_contains($text, 'co the giup gi')
+            || str_contains($text, 'giup duoc gi')
+            || str_contains($text, 'ho tro gi')
+            || str_contains($text, 'tu van gi')
+            || (str_contains($text, 'tim hieu') && str_contains($text, 'thong tin'));
+    }
+
+    /**
+     * Find relevant in-stock products for a useful offline fallback.
+     */
+    private function findMatchingProducts(string $userText)
+    {
+        $normalizedText = preg_replace('/[^a-z0-9]+/u', ' ', Str::lower(Str::ascii($userText))) ?? '';
+        $stopWords = [
+            'ban', 'biet', 'cac', 'can', 'cho', 'co', 'cua', 'duoc', 'gi', 'giup', 'hay',
+            'hieu', 'la', 'loai', 'minh', 'mot', 'muon', 'nao', 'nay', 'pham', 'san',
+            'the', 'thong', 'tin', 'tim', 'toi', 've', 'voi', 'xin', 'nhung',
+        ];
+        $keywords = collect(preg_split('/\s+/u', trim($normalizedText)) ?: [])
+            ->filter(fn ($word) => strlen($word) >= 2 && !in_array($word, $stopWords, true))
+            ->unique()
+            ->values();
+
+        if ($keywords->isEmpty()) {
+            return collect();
+        }
+
+        $matches = Product::with('category')
+            ->where('status', 'in_stock')
+            ->where('stock', '>', 0)
+            ->get()
+            ->map(function ($product) use ($keywords) {
+                $searchableText = $product->name . ' ' . ($product->category?->name ?? '');
+                $normalizedName = Str::lower(Str::ascii($searchableText));
+                $score = $keywords->sum(
+                    fn ($keyword) => str_contains($normalizedName, $keyword) ? strlen($keyword) : 0
+                );
+
+                return ['product' => $product, 'score' => $score];
+            })
+            ->filter(fn ($match) => $match['score'] > 0)
+            ->sortByDesc('score');
+
+        if ($matches->isEmpty()) {
+            return collect();
+        }
+
+        $minimumScore = (int) ceil($matches->max('score') * 0.7);
+
+        return $matches
+            ->filter(fn ($match) => $match['score'] >= $minimumScore)
+            ->take(3)
+            ->pluck('product')
+            ->values();
+
+        }
 }

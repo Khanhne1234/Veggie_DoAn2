@@ -99,7 +99,7 @@
                             <div class="footer-widget footer-newsletter-widget">
                                 <h4 class="footer-title">Bảng tin</h4>
                                 <p>Đăng ký nhận Bản tin hàng tuần của chúng tôi và nhận thông tin cập nhật qua email.
-                                </p>
+                                    {{-- </p>
                                 <div class="footer-newsletter">
                                     <form action="#">
                                         <input type="email" name="email" placeholder="Email*">
@@ -108,7 +108,7 @@
                                                     class="fas fa-location-arrow"></i></button>
                                         </div>
                                     </form>
-                                </div>
+                                </div> --}}
                                 <h5 class="mt-30">Chúng tôi chấp nhận</h5>
                                 <img src="{{ asset('assets/clients/img/icons/payment-4.png') }}" alt="Payment Image">
                             </div>

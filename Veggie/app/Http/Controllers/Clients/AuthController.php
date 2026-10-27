@@ -43,7 +43,7 @@ class AuthController extends Controller
             if ($existEmail->isPending()) {
                 return redirect()->route('login')->with('toastr', [
                     'type' => 'warning',
-                    'message' => 'Email đã tồn tại và đang chờ duyệt!',
+                    'message' => 'Email này đã đăng ký nhưng chưa kích hoạt. Vui lòng kiểm tra email để kích hoạt tài khoản!',
                 ]);
             }
 
@@ -68,7 +68,7 @@ class AuthController extends Controller
 
         return redirect()->route('login')->with('toastr', [
             'type' => 'success',
-            'message' => 'Đăng ký thành công! Vui lòng chờ quản trị viên duyệt tài khoản của bạn.',
+            'message' => 'Đăng ký thành công! Vui lòng kiểm tra email và nhấn vào link kích hoạt để đăng nhập.',
         ]);
     }
 

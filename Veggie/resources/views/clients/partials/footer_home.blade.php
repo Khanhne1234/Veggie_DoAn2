@@ -101,13 +101,13 @@
                                 <p>Đăng ký nhận Bản tin hàng tuần của chúng tôi và nhận thông tin cập nhật qua email.
                                 </p>
                                 <div class="footer-newsletter">
-                                    <form action="#">
+                                    {{-- <form action="#">
                                         <input type="email" name="email" placeholder="Email*">
                                         <div class="btn-wrapper">
                                             <button class="theme-btn-1 btn" type="submit"><i
                                                     class="fas fa-location-arrow"></i></button>
                                         </div>
-                                    </form>
+                                    </form> --}}
                                 </div>
                                 <h5 class="mt-30">Chúng tôi chấp nhận</h5>
                                 <img src="{{ asset('assets/clients/img/icons/payment-4.png') }}" alt="Payment Image">

@@ -6,150 +6,243 @@ document.addEventListener('DOMContentLoaded', function () {
     const chatMessages = document.getElementById('chat-messages');
     const messageInput = document.getElementById('message-input');
     const sendBtn = document.getElementById('send-btn');
+    const requiredElements = [chatWidget, chatToggle, chatBox, chatClose, chatMessages, messageInput, sendBtn];
 
-    if (!chatWidget || !chatToggle || !chatBox || !chatClose || !chatMessages || !messageInput || !sendBtn) {
+    if (requiredElements.some(element => !element)) {
         console.warn('Chat AI elements not found.');
         return;
     }
 
-    const isLoggedIn = chatWidget.getAttribute('data-logged-in') === 'true';
+    const isLoggedIn = chatWidget.dataset.loggedIn === 'true';
     const guestToken = isLoggedIn ? null : getOrCreateGuestToken();
-    let historyLoaded = false;
+    const historyUrl = chatWidget.dataset.historyUrl;
+    const sendUrl = chatWidget.dataset.sendUrl;
+    const welcomeMessage = 'Xin chào! Tôi là trợ lý ảo của Veggie. Tôi có thể giúp bạn tìm kiếm sản phẩm, kiểm tra đơn hàng hoặc tư vấn dinh dưỡng. 🌿';
+    let historyPromise = null;
+    let isSending = false;
 
-    // Toggle chat visibility
     chatToggle.addEventListener('click', function () {
-        chatBox.classList.toggle('hidden');
-        if (!chatBox.classList.contains('hidden')) {
-            if (!historyLoaded) {
-                loadChatHistory();
-            }
+        const shouldOpen = chatBox.classList.contains('hidden');
+        setChatOpen(shouldOpen);
+
+        if (shouldOpen) {
+            loadChatHistory();
             messageInput.focus();
         }
     });
 
-    // Close chat
     chatClose.addEventListener('click', function () {
-        chatBox.classList.add('hidden');
+        setChatOpen(false);
+        chatToggle.focus();
     });
 
-    // Send message on button click
     sendBtn.addEventListener('click', sendMessage);
 
-    // Send message on Enter key
-    messageInput.addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
+    messageInput.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter' && !event.isComposing) {
+            event.preventDefault();
             sendMessage();
         }
     });
 
+    function setChatOpen(isOpen) {
+        chatBox.classList.toggle('hidden', !isOpen);
+        chatBox.setAttribute('aria-hidden', String(!isOpen));
+        chatToggle.setAttribute('aria-expanded', String(isOpen));
+        chatToggle.setAttribute('aria-label', isOpen ? 'Đóng hỗ trợ trực tuyến' : 'Mở hỗ trợ trực tuyến');
+    }
+
     function getOrCreateGuestToken() {
         let token = localStorage.getItem('chat_guest_token');
+
         if (!token) {
             token = 'guest_' + Math.random().toString(36).substring(2, 15) + '_' + Date.now();
             localStorage.setItem('chat_guest_token', token);
         }
+
         return token;
     }
 
     function loadChatHistory() {
-        let url = '/chat/history';
-        if (!isLoggedIn && guestToken) {
-            url += '?guest_token=' + encodeURIComponent(guestToken);
+        if (historyPromise) {
+            return historyPromise;
         }
 
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                historyLoaded = true;
-                if (data.status === 'success' && data.messages.length > 0) {
-                    chatMessages.innerHTML = ''; // clear initial welcome/placeholder
-                    data.messages.forEach(msg => {
-                        appendMessage(msg.sender, msg.message);
-                    });
-                } else {
-                    // Show welcoming message if no history
-                    appendMessage('bot', 'Xin chào! Cảm ơn bạn đã ghé thăm Veggie. Tôi có thể giúp gì cho bạn hôm nay? 🌿');
+        historyPromise = (async function () {
+            try {
+                const url = new URL(historyUrl, window.location.origin);
+
+                if (!isLoggedIn && guestToken) {
+                    url.searchParams.set('guest_token', guestToken);
                 }
-            })
-            .catch(error => {
+
+                const response = await fetch(url, {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw createHttpError(response.status);
+                }
+
+                const data = await response.json();
+                chatMessages.replaceChildren();
+
+                if (data.status === 'success' && Array.isArray(data.messages) && data.messages.length > 0) {
+                    data.messages.forEach(message => {
+                        appendMessage(message.sender, message.message);
+                    });
+                    return;
+                }
+
+                appendMessage('bot', welcomeMessage);
+            } catch (error) {
                 console.error('Error loading chat history:', error);
-                appendMessage('bot', 'Xin chào! Cảm ơn bạn đã ghé thăm Veggie. Tôi có thể giúp gì cho bạn hôm nay? 🌿');
-            });
+
+                if (!chatMessages.querySelector('.chat-message')) {
+                    appendMessage('bot', welcomeMessage);
+                }
+            }
+        })();
+
+        return historyPromise;
     }
 
-    function sendMessage() {
+    async function sendMessage() {
         const text = messageInput.value.trim();
-        if (text === '') return;
 
-        // Display user's message immediately
+        if (!text || isSending) {
+            return;
+        }
+
         appendMessage('user', text);
         messageInput.value = '';
-
-        // Show typing indicator
+        setSending(true);
         showTypingIndicator();
 
-        const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
-        const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute('content') : '';
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+        const abortController = new AbortController();
+        const timeoutId = window.setTimeout(() => abortController.abort(), 20000);
 
-        // Send to backend
-        fetch('/chat/send', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken
-            },
-            body: JSON.stringify({
-                message: text,
-                guest_token: guestToken
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            hideTypingIndicator();
-            if (data.status === 'success') {
-                appendMessage('bot', data.bot_message.message);
-            } else {
-                appendMessage('bot', 'Xin lỗi, hệ thống đang gặp sự cố. Vui lòng thử lại sau! 😢');
+        try {
+            const response = await fetch(sendUrl, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken ?? ''
+                },
+                body: JSON.stringify({
+                    message: text,
+                    guest_token: guestToken
+                }),
+                signal: abortController.signal
+            });
+            const data = await parseJsonResponse(response);
+
+            if (!response.ok) {
+                throw createHttpError(response.status, data);
             }
-        })
-        .catch(error => {
-            console.error('Error sending message:', error);
+
+            const reply = data?.bot_message?.message ?? data?.bot_message ?? data?.message;
+
+            if (data?.status !== 'success' || typeof reply !== 'string' || reply.trim() === '') {
+                throw createHttpError(502, data);
+            }
+
+            appendMessage('bot', reply);
+        } catch (error) {
+            console.error('Error sending chat message:', error);
+            appendMessage('bot', getErrorMessage(error));
+        } finally {
+            window.clearTimeout(timeoutId);
             hideTypingIndicator();
-            appendMessage('bot', 'Lỗi kết nối máy chủ. Vui lòng kiểm tra lại kết nối mạng! 📡');
-        });
+            setSending(false);
+            messageInput.focus();
+        }
+    }
+
+    async function parseJsonResponse(response) {
+        const responseText = await response.text();
+
+        if (!responseText) {
+            return {};
+        }
+
+        try {
+            return JSON.parse(responseText);
+        } catch (error) {
+            const invalidResponseError = createHttpError(response.status);
+            invalidResponseError.code = 'INVALID_JSON';
+            throw invalidResponseError;
+        }
+    }
+
+    function createHttpError(status, data = {}) {
+        const error = new Error(data.message ?? 'Chat request failed');
+        error.status = status;
+        error.data = data;
+        return error;
+    }
+
+    function getErrorMessage(error) {
+        if (error.name === 'AbortError') {
+            return 'Phản hồi đang mất nhiều thời gian hơn dự kiến. Bạn vui lòng thử lại nhé! ⏳';
+        }
+
+        if (error.status === 419) {
+            return 'Phiên làm việc đã hết hạn. Vui lòng tải lại trang rồi gửi lại tin nhắn. 🔄';
+        }
+
+        if (error.status === 422) {
+            return error.data?.message ?? 'Nội dung tin nhắn chưa hợp lệ. Vui lòng kiểm tra lại.';
+        }
+
+        if (error.status >= 500 || error.code === 'INVALID_JSON') {
+            return 'Hệ thống hỗ trợ đang tạm thời bận. Vui lòng thử lại sau ít phút. 🌿';
+        }
+
+        return 'Không thể kết nối tới hệ thống hỗ trợ. Vui lòng kiểm tra mạng và thử lại. 📡';
+    }
+
+    function setSending(sending) {
+        isSending = sending;
+        sendBtn.disabled = sending;
+        sendBtn.setAttribute('aria-busy', String(sending));
+        sendBtn.textContent = sending ? 'Đang gửi...' : 'Gửi';
     }
 
     function appendMessage(sender, text) {
         const messageDiv = document.createElement('div');
-        messageDiv.className = `chat-message ${sender}`;
-        
-        // Support formatting with line breaks in responses
-        messageDiv.innerHTML = text.replace(/\n/g, '<br>');
-        
+        messageDiv.className = 'chat-message ' + (sender === 'user' ? 'user' : 'bot');
+        messageDiv.textContent = String(text ?? '');
         chatMessages.appendChild(messageDiv);
         scrollToBottom();
     }
 
     function showTypingIndicator() {
-        if (document.getElementById('typing-indicator')) return;
+        if (document.getElementById('typing-indicator')) {
+            return;
+        }
 
         const indicator = document.createElement('div');
         indicator.id = 'typing-indicator';
         indicator.className = 'typing-indicator';
-        indicator.innerHTML = `
-            <div class="typing-dot"></div>
-            <div class="typing-dot"></div>
-            <div class="typing-dot"></div>
-        `;
+        indicator.setAttribute('aria-label', 'Trợ lý đang trả lời');
+
+        for (let index = 0; index < 3; index += 1) {
+            const dot = document.createElement('span');
+            dot.className = 'typing-dot';
+            indicator.appendChild(dot);
+        }
+
         chatMessages.appendChild(indicator);
         scrollToBottom();
     }
 
     function hideTypingIndicator() {
-        const indicator = document.getElementById('typing-indicator');
-        if (indicator) {
-            indicator.remove();
-        }
+        document.getElementById('typing-indicator')?.remove();
     }
 
     function scrollToBottom() {

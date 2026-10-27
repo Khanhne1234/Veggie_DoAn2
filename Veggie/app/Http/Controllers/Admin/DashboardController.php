@@ -14,16 +14,22 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-        $users = User::where('role_id', 3)->latest()->get();
-        $categories = Category::with('products')->get();
-        $products = Product::where('stock', '>', 0)->latest()->get();
+        $totalUsers = User::where('role_id', 3)->count();
+        $totalProducts = Product::where('stock', '>', 0)->count();
+        $totalOrders = Order::count();
+        $totalRevenue = Order::sum('total_price');
+
+        $users = User::where('role_id', 3)->latest()->limit(5)->get();
+        $categories = Category::withCount('products')
+            ->orderByDesc('products_count')
+            ->limit(5)
+            ->get();
         $orders = Order::with('shippingAddress')->latest()->limit(5)->get();
 
-        //Get list top3 bestseller product
-
+        // Get the five best-selling products to match the dashboard table height.
         $topSellingProducts = Product::withSum('oderItems as total_sold', 'quantity')
             ->orderBy('total_sold', 'desc')
-            ->limit(3)
+            ->limit(5)
             ->get();
 
         $monthlyRevenue = Order::select(
@@ -34,6 +40,16 @@ class DashboardController extends Controller
             ->orderBy('month', 'ASC')
             ->get();
 
-        return view('admin.pages.dashboard', compact('users', 'categories', 'products', 'orders', 'topSellingProducts', 'monthlyRevenue'));
+        return view('admin.pages.dashboard', compact(
+            'totalUsers',
+            'totalProducts',
+            'totalOrders',
+            'totalRevenue',
+            'users',
+            'categories',
+            'orders',
+            'topSellingProducts',
+            'monthlyRevenue'
+        ));
     }
 }

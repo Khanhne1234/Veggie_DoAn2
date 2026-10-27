@@ -56,6 +56,7 @@
     <link href="{{ asset('assets/admin/css/custom.css') }}" rel="stylesheet">
     <!-- Custom Theme Style -->
     <link href="{{ asset('assets/admin/build/css/custom.min.css') }}" rel="stylesheet">
+    @stack('styles')
 
 </head>
 
@@ -169,6 +170,8 @@
             @endforeach
         </script>
     @endif
+
+    @stack('scripts')
 
 </body>
 

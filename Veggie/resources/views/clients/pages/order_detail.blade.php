@@ -32,10 +32,12 @@
                     <div class="order-summary-item">
                         <span class="summary-label">Thanh toán</span>
                         <div class="summary-value">
-                            @if ($order->payment && $order->payment->payment_method == 'cod')
+                            @if ($order->payment && in_array($order->payment->payment_method, ['cash', 'cod'], true))
                                 <span class="badge bg-primary">Thanh toán khi nhận hàng (COD)</span>
-                            @elseif ($order->payment && $order->payment->payment_method == 'paypal')
+                            @elseif ($order->payment && $order->payment->payment_method === 'paypal')
                                 <span class="badge bg-primary">Thanh toán qua PayPal</span>
+                            @elseif (!$order->payment)
+                                <span class="badge bg-secondary">Chưa có thông tin thanh toán</span>
                             @else
                                 <span class="badge bg-secondary">Không xác định</span>
                             @endif
