@@ -1,3 +1,40 @@
+/**
+ * Bootstrap 5 no longer exposes the jQuery modal plugin. Keep modal actions
+ * compatible with Bootstrap 5 and fail safely when a modal is not rendered.
+ */
+function showClientModal(selector) {
+    const modalElement = document.querySelector(selector);
+
+    if (!modalElement) {
+        return;
+    }
+
+    if (window.bootstrap && window.bootstrap.Modal) {
+        window.bootstrap.Modal.getOrCreateInstance(modalElement).show();
+        return;
+    }
+
+    if (window.jQuery && window.jQuery.fn && window.jQuery.fn.modal) {
+        window.jQuery(modalElement).modal("show");
+    }
+}
+
+function hideClientModal(selector) {
+    const modalElement = document.querySelector(selector);
+
+    if (!modalElement) {
+        return;
+    }
+
+    if (window.bootstrap && window.bootstrap.Modal) {
+        window.bootstrap.Modal.getOrCreateInstance(modalElement).hide();
+        return;
+    }
+
+    if (window.jQuery && window.jQuery.fn && window.jQuery.fn.modal) {
+        window.jQuery(modalElement).modal("hide");
+    }
+}
 $(document).ready(function () {
     // Hiển thị thông báo toastr nếu có session registerSuccess
     $("#register-form").submit(function (event) {
@@ -542,8 +579,8 @@ $(document).ready(function () {
                 quantity: quantity,
             },
             success: function (response) {
-                $("#add_to_cart_modal-" + productId).modal("show");
-                $("#quick_view_modal-" + productId).modal("hide");
+                hideClientModal("#quick_view_modal-" + productId);
+                showClientModal("#add_to_cart_modal-" + productId);
                 $("#cart_count").text(response.cart_count);
             },
             error: function (xhr, status, error) {
@@ -764,6 +801,77 @@ $(document).ready(function () {
             $("#order_button_cash").prop("disabled", true);
         }
     });
+    async function submitPayPalOrder(payload) {
+        const tokenElement = document.querySelector('meta[name="csrf-token"]');
+        const sendRequest = (token) =>
+            fetch("/checkout/paypal", {
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                    "X-Requested-With": "XMLHttpRequest",
+                    "X-CSRF-TOKEN": token || "",
+                },
+                body: JSON.stringify({ ...payload, _token: token || "" }),
+            });
+
+        let token = tokenElement ? tokenElement.getAttribute("content") : "";
+        let response = await sendRequest(token);
+
+        if (response.status === 419) {
+            const refreshResponse = await fetch("/csrf-token", {
+                credentials: "same-origin",
+                cache: "no-store",
+                headers: {
+                    Accept: "application/json",
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+            });
+            const refreshType =
+                refreshResponse.headers.get("content-type") || "";
+
+            if (
+                !refreshResponse.ok ||
+                !refreshType.includes("application/json")
+            ) {
+                throw new Error(
+                    "Phien dang nhap da het han. Vui long tai lai trang.",
+                );
+            }
+
+            const refreshData = await refreshResponse.json();
+            token = refreshData.token || "";
+
+            if (!token) {
+                throw new Error(
+                    "Khong lay duoc CSRF token moi. Vui long tai lai trang.",
+                );
+            }
+
+            if (tokenElement) {
+                tokenElement.setAttribute("content", token);
+            }
+
+            response = await sendRequest(token);
+        }
+
+        const contentType = response.headers.get("content-type") || "";
+        const responseData = contentType.includes("application/json")
+            ? await response.json()
+            : null;
+
+        if (!response.ok || !responseData) {
+            throw new Error(
+                responseData?.message ||
+                    (response.status === 419
+                        ? "Phien dang nhap da het han. Vui long tai lai trang."
+                        : "Khong the hoan tat thanh toan PayPal."),
+            );
+        }
+
+        return responseData;
+    }
 
     if ($("#paypal-button-container").length) {
         var totalPriceVnd = Number($(".totalPrice_Checkout").data("total-vnd"));
@@ -788,24 +896,15 @@ $(document).ready(function () {
                 onApprove: function (data, actions) {
                     return actions.order.capture().then(function (details) {
                         // Gửi thông tin đơn hàng về server để xử lý
-                        fetch("/checkout/paypal", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
-                                    "content",
-                                ),
-                            },
-                            body: JSON.stringify({
-                                orderID: data.orderID,
-                                payerID: data.payerID,
-                                transactionID: details.id,
-                                amount: details.purchase_units[0].amount.value,
-                                address_id: $("#list_address").val(),
-                                paymentDetails: details,
-                            }),
+                        return submitPayPalOrder({
+                            orderID: data.orderID,
+                            payerID: data.payerID,
+                            transactionID:
+                                details.purchase_units?.[0]?.payments?.captures?.[0]?.id || details.id,
+                            amount: details.purchase_units[0].amount.value,
+                            address_id: $("#list_address").val(),
+                            paymentDetails: details,
                         })
-                            .then((response) => response.json())
                             .then((data) => {
                                 if (data.success) {
                                     toastr.success(data.message, "Thành công");
@@ -813,7 +912,14 @@ $(document).ready(function () {
                                 } else {
                                     toastr.error(data.message, "Lỗi", {});
                                 }
-                            });
+                            })
+                            .catch(function (error) {
+                                toastr.error(
+                                    error.message ||
+                                        "Khong the hoan tat thanh toan PayPal.",
+                                    "Loi thanh toan",
+                                );
+                    });
                     });
                 },
             })
@@ -960,7 +1066,8 @@ $(document).ready(function () {
             },
             success: function (response) {
                 if (response.status) {
-                    $("#liton_wishlist_modal-" + productId).modal("show");
+                    hideClientModal("#quick_view_modal-" + productId);
+                    showClientModal("#liton_wishlist_modal-" + productId);
                 }
             },
             error: function (xhr, status, error) {

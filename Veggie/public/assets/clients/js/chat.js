@@ -13,20 +13,22 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
     }
 
-    const isLoggedIn = chatWidget.dataset.loggedIn === 'true';
-    const guestToken = isLoggedIn ? null : getOrCreateGuestToken();
     const historyUrl = chatWidget.dataset.historyUrl;
     const sendUrl = chatWidget.dataset.sendUrl;
     const welcomeMessage = 'Xin chào! Tôi là trợ lý ảo của Veggie. Tôi có thể giúp bạn tìm kiếm sản phẩm, kiểm tra đơn hàng hoặc tư vấn dinh dưỡng. 🌿';
     let historyPromise = null;
+    let historyLoaded = false;
     let isSending = false;
 
     chatToggle.addEventListener('click', function () {
         const shouldOpen = chatBox.classList.contains('hidden');
         setChatOpen(shouldOpen);
 
-        if (shouldOpen) {
+        if (shouldOpen && !isSending) {
             loadChatHistory();
+        }
+
+        if (shouldOpen) {
             messageInput.focus();
         }
     });
@@ -52,30 +54,18 @@ document.addEventListener('DOMContentLoaded', function () {
         chatToggle.setAttribute('aria-label', isOpen ? 'Đóng hỗ trợ trực tuyến' : 'Mở hỗ trợ trực tuyến');
     }
 
-    function getOrCreateGuestToken() {
-        let token = localStorage.getItem('chat_guest_token');
-
-        if (!token) {
-            token = 'guest_' + Math.random().toString(36).substring(2, 15) + '_' + Date.now();
-            localStorage.setItem('chat_guest_token', token);
+    async function loadChatHistory() {
+        if (historyLoaded) {
+            return true;
         }
 
-        return token;
-    }
-
-    function loadChatHistory() {
         if (historyPromise) {
             return historyPromise;
         }
 
-        historyPromise = (async function () {
+        const currentHistoryPromise = (async function () {
             try {
                 const url = new URL(historyUrl, window.location.origin);
-
-                if (!isLoggedIn && guestToken) {
-                    url.searchParams.set('guest_token', guestToken);
-                }
-
                 const response = await fetch(url, {
                     headers: {
                         'Accept': 'application/json'
@@ -93,20 +83,32 @@ document.addEventListener('DOMContentLoaded', function () {
                     data.messages.forEach(message => {
                         appendMessage(message.sender, message.message);
                     });
-                    return;
+                } else {
+                    appendMessage('bot', welcomeMessage);
                 }
 
-                appendMessage('bot', welcomeMessage);
+                historyLoaded = true;
+                return true;
             } catch (error) {
                 console.error('Error loading chat history:', error);
 
                 if (!chatMessages.querySelector('.chat-message')) {
                     appendMessage('bot', welcomeMessage);
                 }
+
+                return false;
             }
         })();
 
-        return historyPromise;
+        historyPromise = currentHistoryPromise;
+
+        try {
+            return await currentHistoryPromise;
+        } finally {
+            if (historyPromise === currentHistoryPromise) {
+                historyPromise = null;
+            }
+        }
     }
 
     async function sendMessage() {
@@ -116,16 +118,19 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        appendMessage('user', text);
-        messageInput.value = '';
         setSending(true);
-        showTypingIndicator();
+        messageInput.value = '';
 
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
         const abortController = new AbortController();
-        const timeoutId = window.setTimeout(() => abortController.abort(), 20000);
+        let timeoutId = null;
 
         try {
+            await loadChatHistory();
+            appendMessage('user', text);
+            showTypingIndicator();
+            timeoutId = window.setTimeout(() => abortController.abort(), 20000);
+
             const response = await fetch(sendUrl, {
                 method: 'POST',
                 headers: {
@@ -134,8 +139,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     'X-CSRF-TOKEN': csrfToken ?? ''
                 },
                 body: JSON.stringify({
-                    message: text,
-                    guest_token: guestToken
+                    message: text
                 }),
                 signal: abortController.signal
             });
@@ -197,6 +201,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (error.status === 422) {
             return error.data?.message ?? 'Nội dung tin nhắn chưa hợp lệ. Vui lòng kiểm tra lại.';
+        }
+
+        if (error.status === 429) {
+            return 'Bạn đang gửi tin nhắn quá nhanh. Vui lòng chờ một phút rồi thử lại nhé! ⏳';
         }
 
         if (error.status >= 500 || error.code === 'INVALID_JSON') {

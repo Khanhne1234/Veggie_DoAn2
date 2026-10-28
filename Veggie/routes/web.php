@@ -72,6 +72,10 @@ Route::middleware(RedirectIfNotAuthenticated::class)->group(function () {
     Route::get('/checkout/get-address', [CheckoutController::class, 'getAddress'])->name('checkout.get-address');
     Route::post('/checkout', [CheckoutController::class, 'placeOrder'])->name('checkout.placeOrder');
     Route::post('/checkout/paypal', [CheckoutController::class, 'placeOrderPaypal'])->name('checkout.placeOrderPaypal');
+    Route::get('/csrf-token', function () {
+        return response()->json(['token' => csrf_token()]);
+    })->name('csrf.token');
+
     //Order
     Route::get('/order/{id}', [OrderController::class, 'ShowOrders'])->name('orders.show');
     Route::post('/order/{id}/received', [OrderController::class, 'receivedOrder'])->name('orders.received');
@@ -110,7 +114,11 @@ Route::post('/contact', [ContactController::class, 'sendContact'])->name('contac
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 
 //Chat AI
-Route::get('/chat/history', [ChatController::class, 'getHistory'])->name('chat.history');
-Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
+Route::get('/chat/history', [ChatController::class, 'getHistory'])
+    ->middleware('throttle:60,1')
+    ->name('chat.history');
+Route::post('/chat/send', [ChatController::class, 'sendMessage'])
+    ->middleware('throttle:20,1')
+    ->name('chat.send');
 
 require __DIR__ . '/admin.php';

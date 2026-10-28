@@ -67,6 +67,10 @@
                                         </div>
                                     @endforelse
                                 </div>
+                                {{-- Render the modal targets used by the product action buttons. --}}
+                                @foreach ($products as $product)
+                                    @include('clients.components.include.include_modals')
+                                @endforeach
                             </div>
                         </div>
                     </div>

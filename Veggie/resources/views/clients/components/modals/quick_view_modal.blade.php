@@ -62,9 +62,7 @@
                                         <div class="ltn__product-details-menu-3">
                                             <ul>
                                                 <li>
-                                                    <a href="javascript:void(0)" class="" title="Wishlist"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#liton_wishlist_modal-{{ $product->id }}">
+                                                    <a href="javascript:void(0)" class="add-to-wishlist" title="Wishlist" data-id="{{ $product->id }}">
                                                         <i class="far fa-heart"></i>
                                                         <span>Thêm vào danh sách yêu thích</span>
                                                     </a>
