@@ -69,6 +69,7 @@ Route::middleware(RedirectIfNotAuthenticated::class)->group(function () {
         Route::delete('/addresses/{id}', [AccountController::class, 'deleteAddress'])->name('account.address.delete');
     });
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
+    Route::post('/checkout/validate-stock', [CheckoutController::class, 'validateStock'])->name('checkout.validate-stock');
     Route::get('/checkout/get-address', [CheckoutController::class, 'getAddress'])->name('checkout.get-address');
     Route::post('/checkout', [CheckoutController::class, 'placeOrder'])->name('checkout.placeOrder');
     Route::post('/checkout/paypal', [CheckoutController::class, 'placeOrderPaypal'])->name('checkout.placeOrderPaypal');
@@ -97,14 +98,14 @@ Route::get('/product/{slug}', [ProductController::class, 'detail'])->name('produ
 
 
 //Handel cart
-Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.add');
-Route::post('/cart/remove', [CartController::class, 'removeFromCart'])->name('cart.remove');
+Route::post('/cart/add', [CartController::class, 'addToCart'])->block(10, 10)->name('cart.add');
+Route::post('/cart/remove', [CartController::class, 'removeFromCart'])->block(10, 10)->name('cart.remove');
 Route::get('/mini-cart', [CartController::class, 'loadMiniCart'])->name('cart.mini');
 
 //Handle page cart
 Route::get('/cart', [CartController::class, 'showCart'])->name('cart');
-Route::post('/cart/update', [CartController::class, 'updateCart'])->name('cart.update');
-Route::post('/cart/remove-cart', [CartController::class, 'removeCart'])->name('cart.remove');
+Route::post('/cart/update', [CartController::class, 'updateCart'])->block(10, 10)->name('cart.update');
+Route::post('/cart/remove-cart', [CartController::class, 'removeCart'])->block(10, 10)->name('cart.remove');
 
 //Handle contact
 Route::get('/contact', [ContactController::class, 'index'])->name('contact.index');

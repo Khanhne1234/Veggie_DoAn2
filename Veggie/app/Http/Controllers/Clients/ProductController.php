@@ -18,7 +18,8 @@ class ProductController extends Controller
     {
         $categories = Category::with('products')->get();
         // Try to get in_stock products, fallback to all products
-        $query = Product::with('firstImage')->where('status', 'in_stock');
+        // Keep sold-out products discoverable so customers can see their stock status.
+        $query = Product::with('firstImage');
 
         if (request()->has('category_id') && !empty(request('category_id'))) {
             $query->where('category_id', request('category_id'));

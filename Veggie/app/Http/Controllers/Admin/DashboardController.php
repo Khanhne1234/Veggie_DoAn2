@@ -8,7 +8,8 @@ use App\Models\User;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Order;
-use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 
 class DashboardController extends Controller
 {
@@ -17,7 +18,7 @@ class DashboardController extends Controller
         $totalUsers = User::where('role_id', 3)->count();
         $totalProducts = Product::where('stock', '>', 0)->count();
         $totalOrders = Order::count();
-        $totalRevenue = Order::sum('total_price');
+        $totalRevenue = Order::whereNotIn('status', ['canceled', 'cancelled'])->sum('total_price');
 
         $users = User::where('role_id', 3)->latest()->limit(5)->get();
         $categories = Category::withCount('products')
@@ -32,13 +33,73 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        $monthlyRevenue = Order::select(
-            DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month"),
-            DB::raw('SUM(total_price) as total_revenue')
-        )
-            ->groupBy('month')
-            ->orderBy('month', 'ASC')
-            ->get();
+        $revenuePeriod = $request->query('revenue_period', 'month');
+        if (!in_array($revenuePeriod, ['day', 'week', 'month'], true)) {
+            $revenuePeriod = 'month';
+        }
+
+        $now = CarbonImmutable::now();
+        $today = $now->startOfDay();
+        $revenueLabels = [];
+        $revenueTotals = [];
+
+        if ($revenuePeriod === 'day') {
+            $rangeStart = $today->subDays(29);
+            $cursor = $rangeStart;
+            while ($cursor->lessThanOrEqualTo($today)) {
+                $key = $cursor->toDateString();
+                $revenueLabels[$key] = $cursor->format('d/m');
+                $revenueTotals[$key] = 0;
+                $cursor = $cursor->addDay();
+            }
+            $revenuePeriodLabel = 'theo ngày';
+        } elseif ($revenuePeriod === 'week') {
+            $currentWeek = $today->startOfWeek(Carbon::MONDAY);
+            $rangeStart = $currentWeek->subWeeks(11);
+            $cursor = $rangeStart;
+            while ($cursor->lessThanOrEqualTo($currentWeek)) {
+                $key = $cursor->toDateString();
+                $revenueLabels[$key] = $cursor->format('d/m') . ' – ' . $cursor->addDays(6)->format('d/m');
+                $revenueTotals[$key] = 0;
+                $cursor = $cursor->addWeek();
+            }
+            $revenuePeriodLabel = 'theo tuần';
+        } else {
+            $currentMonth = $today->startOfMonth();
+            $rangeStart = $currentMonth->subMonths(11);
+            $cursor = $rangeStart;
+            while ($cursor->lessThanOrEqualTo($currentMonth)) {
+                $key = $cursor->format('Y-m');
+                $revenueLabels[$key] = 'T' . $cursor->format('m/Y');
+                $revenueTotals[$key] = 0;
+                $cursor = $cursor->addMonth();
+            }
+            $revenuePeriodLabel = 'theo tháng';
+        }
+
+        $revenueOrders = Order::query()
+            ->whereNotIn('status', ['canceled', 'cancelled'])
+            ->where('created_at', '>=', $rangeStart)
+            ->where('created_at', '<=', $now)
+            ->get(['created_at', 'total_price']);
+
+        foreach ($revenueOrders as $order) {
+            $createdAt = CarbonImmutable::instance($order->created_at);
+            $key = match ($revenuePeriod) {
+                'day' => $createdAt->toDateString(),
+                'week' => $createdAt->startOfWeek(Carbon::MONDAY)->toDateString(),
+                default => $createdAt->format('Y-m'),
+            };
+
+            if (array_key_exists($key, $revenueTotals)) {
+                $revenueTotals[$key] += (float) $order->total_price;
+            }
+        }
+
+        $revenueSeries = [
+            'labels' => array_values($revenueLabels),
+            'values' => array_values($revenueTotals),
+        ];
 
         return view('admin.pages.dashboard', compact(
             'totalUsers',
@@ -49,7 +110,9 @@ class DashboardController extends Controller
             'categories',
             'orders',
             'topSellingProducts',
-            'monthlyRevenue'
+            'revenueSeries',
+            'revenuePeriod',
+            'revenuePeriodLabel'
         ));
     }
 }

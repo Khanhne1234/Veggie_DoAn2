@@ -9,7 +9,7 @@
 @section('content')
     @php
         $categoryColors = ['#16a34a', '#3b82f6', '#f59e0b', '#8b5cf6', '#ef4444'];
-        $hasRevenueData = $monthlyRevenue->sum('total_revenue') > 0;
+        $hasRevenueData = collect($revenueSeries['values'])->sum() > 0;
         $hasCategoryData = $categories->sum('products_count') > 0;
     @endphp
 
@@ -72,23 +72,29 @@
                     <div class="dashboard-panel__header">
                         <div>
                             <span class="dashboard-panel__eyebrow">Thống kê</span>
-                            <h2>Doanh thu theo tháng</h2>
+                            <h2>Doanh thu {{ $revenuePeriodLabel }}</h2>
                         </div>
-                        <span class="dashboard-panel__icon dashboard-panel__icon--green" aria-hidden="true">
-                            <i class="fa fa-bar-chart"></i>
-                        </span>
+                        <form method="GET" action="{{ route('admin.dashboard') }}" class="revenue-period-form">
+                            <label class="sr-only" for="revenuePeriod">Thống kê doanh thu</label>
+                            <select id="revenuePeriod" name="revenue_period" class="revenue-period-select"
+                                onchange="this.form.submit()">
+                                <option value="day" @selected($revenuePeriod === 'day')>Theo ngày</option>
+                                <option value="week" @selected($revenuePeriod === 'week')>Theo tuần</option>
+                                <option value="month" @selected($revenuePeriod === 'month')>Theo tháng</option>
+                            </select>
+                        </form>
                     </div>
 
                     <div class="dashboard-panel__body dashboard-chart-wrap">
                         @if ($hasRevenueData)
                             <canvas id="dashboardRevenueChart"
-                                data-labels='@json($monthlyRevenue->pluck('month')->toArray())'
-                                data-values='@json($monthlyRevenue->pluck('total_revenue')->toArray())'></canvas>
+                                data-labels='@json($revenueSeries['labels'])'
+                                data-values='@json($revenueSeries['values'])'></canvas>
                         @else
                             <div class="dashboard-empty dashboard-empty--chart">
                                 <span class="dashboard-empty__icon"><i class="fa fa-bar-chart"></i></span>
                                 <strong>Chưa có dữ liệu doanh thu</strong>
-                                <p>Biểu đồ sẽ tự động cập nhật khi có đơn hàng mới.</p>
+                                <p>Chưa có đơn hàng trong khoảng thời gian này.</p>
                             </div>
                         @endif
                     </div>

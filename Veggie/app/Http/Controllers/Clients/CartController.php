@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Clients;
 use App\Http\Controllers\Controller;
 use App\Models\CartItem;
 use App\Models\Product;
+use App\Models\User;
+use App\Services\CartInventory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class CartController extends Controller
 {
@@ -18,214 +20,216 @@ class CartController extends Controller
             return CartItem::with('product.firstImage')
                 ->where('user_id', Auth::id())
                 ->get()
-                ->map(function ($item) {
-                    $product = $item->product;
+                ->groupBy('product_id')
+                ->map(function ($items) {
+                    $product = $items->first()->product;
+                    $quantity = (int) $items->sum('quantity');
+                    $invalid = $items->first(fn ($item) => (int) $item->quantity < 1);
 
-                    return [
-                        'product' => $product,
-                        'quantity' => (int) $item->quantity,
-                        'subtotal' => $product ? $product->price * $item->quantity : 0,
-                    ];
+                    return $this->cartRow($product, $quantity, $invalid ? (int) $invalid->quantity : null);
                 })
                 ->filter(fn($item) => $item['product'] !== null)
                 ->values()
                 ->all();
         }
 
-        return collect(session()->get('cart', []))
-            ->map(function (array $item) {
-                $product = Product::with('firstImage')->find($item['product_id'] ?? null);
+        $cart = session()->get('cart', []);
+        $products = Product::with('firstImage')->whereIn('id', array_keys($cart))->get()->keyBy('id');
 
-                return [
-                    'product' => $product,
-                    'quantity' => (int) ($item['quantity'] ?? 0),
-                    'subtotal' => $product ? $product->price * (int) ($item['quantity'] ?? 0) : 0,
-                ];
-            })
+        return collect($cart)
+            ->map(fn (array $item, $id) => $this->cartRow($products->get($id), (int) ($item['quantity'] ?? 0)))
             ->filter(fn($item) => $item['product'] !== null)
             ->values()
             ->all();
     }
 
+    private function cartRow(?Product $product, int $quantity, ?int $invalidQuantity = null): array
+    {
+        return [
+            'product' => $product,
+            'quantity' => $quantity,
+            'subtotal' => $product ? $product->price * $quantity : 0,
+            'stock' => max(0, (int) ($product?->stock ?? 0)),
+            'is_out_of_stock' => !$product || $product->stock <= 0,
+            'stock_issue' => CartInventory::issue($product, $invalidQuantity ?? $quantity),
+        ];
+    }
+
+    private function viewData(): array
+    {
+        $cartItems = $this->getCartItems();
+        $cartTotal = collect($cartItems)->sum('subtotal');
+        $hasStockIssues = collect($cartItems)->contains(fn ($item) => $item['stock_issue'] !== null);
+        $canCheckout = count($cartItems) > 0 && !$hasStockIssues;
+
+        return compact('cartItems', 'cartTotal', 'hasStockIssues', 'canCheckout');
+    }
+
+    private function cartResponse(): array
+    {
+        $data = $this->viewData();
+        $total = $data['cartTotal'];
+
+        return [
+            'cart_count' => (int) collect($data['cartItems'])->sum('quantity'),
+            'total' => number_format($total, 0, ',', '.'),
+            'grandTotal' => number_format($total + (count($data['cartItems']) ? 15000 : 0), 0, ',', '.'),
+            'can_checkout' => $data['canCheckout'],
+            'has_stock_issues' => $data['hasStockIssues'],
+            'cart_html' => view('clients.components.include.cart_content', $data)->render(),
+            'mini_cart_html' => view('clients.components.include.mini_cart_content', $data)->render(),
+        ];
+    }
+
     public function addToCart(Request $request)
     {
-        Log::info('addToCart called', ['user_id' => Auth::id(), 'payload' => $request->all()]);
-        $request->merge(['quantity' => (int)$request->quantity]);
-        $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1',
-        ]);
-
-        $product = Product::findOrFail($request->product_id);
-        // Kiểm tra nếu số lượng yêu cầu vượt quá tồn kho
-        if ($request->quantity > $product->stock) {
-            return response()->json(['error' => 'Số lượng vượt quá tồn kho'], 400);
-        }
-        // Nếu người dùng đã đăng nhập, thêm sản phẩm vào giỏ hàng của họ
-        if (Auth::check()) {
-            $cartItem = CartItem::where('user_id', Auth::id())
-                ->where('product_id', $request->product_id) // Tìm kiếm sản phẩm trong giỏ hàng của người dùng
-                ->first(); // Kiểm tra nếu sản phẩm đã tồn tại trong giỏ hàng
-            if ($cartItem) {
-                $cartItem->quantity += $request->quantity; // Cộng dồn số lượng nếu sản phẩm đã tồn tại trong giỏ hàng
-                $cartItem->save(); // Cập nhật số lượng nếu sản phẩm đã tồn tại trong giỏ hàng
-                Log::info('cartItem updated', ['id' => $cartItem->id, 'quantity' => $cartItem->quantity]);
-            } else {
-                CartItem::create([
-                    'user_id' => Auth::id(),
-                    'product_id' => $request->product_id,
-                    'quantity' => $request->quantity,
-                ]);
-                Log::info('cartItem created', ['user_id' => Auth::id(), 'product_id' => $request->product_id, 'quantity' => $request->quantity]);
-            }
-            $cartCount = CartItem::where('user_id', Auth::id())->sum('quantity'); // Tổng số lượng sản phẩm trong giỏ hàng của người dùng
-            Log::info('cartCount for user', ['user_id' => Auth::id(), 'cart_count' => $cartCount]);
-        } else {
-            // Nếu người dùng chưa đăng nhập, lưu sản phẩm vào session
-            $cart = session()->get('cart', []);
-            if (isset($cart[$request->product_id])) {
-                $cart[$request->product_id]['quantity'] += $request->quantity; // Cộng dồn số lượng nếu sản phẩm đã tồn tại trong giỏ hàng
-            } else {
-                $cart[$request->product_id] = [
-                    'product_id' => $request->product_id,
-                    'name' => $product->name,
-                    'price' => $product->price,
-                    'quantity' => $request->quantity,
-                    'stock' => $product->stock,
-                    'image' => $product->firstImage?->image ?? 'upload/products/default_product.webp',
-                ];
-            }
-            session()->put('cart', $cart);
-            Log::info('cart saved to session', ['session_cart' => $cart]);
-            $cartCount = array_sum(array_column($cart, 'quantity')); // Tổng số lượng sản phẩm trong giỏ hàng của người dùng
-        }
-        return response()->json([
-            'success' => true,
-            'message' => 'Thêm vào giỏ hàng thành công',
-            'cart_count' => $cartCount
-        ]);
+        return $this->changeQuantity($request, true);
     }
     // Load mini cart
     public function loadMiniCart()
     {
-        $cartItems = $this->getCartItems();
-        return response()->json([
-            'status' => true,
-            'html' => view('clients.components.include.mini_cart', compact('cartItems'))->render()
-        ]);
+        $state = $this->cartResponse();
+
+        return response()->json(['status' => true, 'html' => $state['mini_cart_html']] + $state);
     }
     // Xóa sản phẩm khỏi giỏ hàng
     public function removeFromCart(Request $request)
     {
-        $request->validate(['product_id' => 'required|exists:products,id',]);
-
-        if (Auth::check()) {
-            CartItem::where('user_id', Auth::id())
-                ->where('product_id', $request->product_id)
-                ->delete();
-            $cartCount = CartItem::where('user_id', Auth::id())->sum('quantity'); // Tổng số lượng sản phẩm trong giỏ hàng của người dùng
-        } else {
-            // Nếu người dùng chưa đăng nhập, xóa sản phẩm khỏi session
-            $cart = session()->get('cart', []);
-            unset($cart[$request->product_id]);
-            session()->put('cart', $cart);
-            $cartCount = array_sum(array_column($cart, 'quantity')); // Tổng số lượng sản phẩm trong giỏ hàng của người dùng
-        }
-
-        return response()->json([
-            'status' => true,
-            'cart_count' => $cartCount,
-            'message' => 'Sản phẩm đã được xóa khỏi giỏ hàng'
-        ]);
+        return $this->removeCart($request);
     }
     // Hiển thị trang giỏ hàng
     public function showCart()
     {
-        $cartItems = $this->getCartItems();
-
-        return view('clients.pages.cart', compact('cartItems'));
+        return view('clients.pages.cart', $this->viewData());
     }
 
     // Cập nhật số lượng sản phẩm trong giỏ hàng
     public function updateCart(Request $request)
     {
-        $productId = $request->input('product_id');
-        $quantity = (int) $request->input('quantity');
-        if (Auth::check()) {
-            $cartItems = CartItem::where('user_id', Auth::id())->where('product_id', $productId)->first();
-            if (!$cartItems) {
-                return response()->json(['error' => 'Sản phẩm không tồn tại trong giỏ hàng'], 404);
-            }
-
-            $product = Product::find($productId);
-
-            if ($quantity > $product->stock) {
-                return response()->json(['error' => 'Số lượng vượt quá tồn kho'], 400);
-            }
-            $cartItems->quantity = $quantity;
-            $cartItems->save();
-        } else {
-            $cart = session()->get('cart', []);
-            if (!isset($cart[$productId])) {
-                return response()->json(['error' => 'Sản phẩm không tồn tại trong giỏ hàng'], 404);
-            }
-
-            $product = Product::find($productId);
-            if ($quantity > $product->stock) {
-                return response()->json(['error' => 'Số lượng vượt quá tồn kho'], 400);
-            }
-
-            $cart[$productId]['quantity'] = $quantity;
-            session()->put('cart', $cart);
-        }
-        $cartCount = Auth::check()
-            ? CartItem::where('user_id', Auth::id())->sum('quantity')
-            : array_sum(array_column(session()->get('cart', []), 'quantity'));
-        // Tính lại tổng số lượng sản phẩm trong giỏ hàng
-        $subTotal = $product->price * $quantity;
-        $total = $this->calculateTotalCart();
-        $grandTotal = $total + 15000; // Nếu có phí vận chuyển hoặc thuế, bạn có thể cộng thêm vào đây
-        return response()->json([
-            'quantity' => $quantity,
-            'subTotal' => number_format($subTotal, 0, ',', '.'),
-            'total' => number_format($total, 0, ',', '.'),
-            'grandTotal' => number_format($grandTotal, 0, ',', '.'),
-            'cart_count' => $cartCount,
-        ]);
+        return $this->changeQuantity($request, false);
     }
-    private function calculateTotalCart(): float
+
+    private function changeQuantity(Request $request, bool $adding)
     {
-        if (Auth::check()) {
-            return CartItem::where('user_id', Auth::id())->with('product')->get()->sum(fn($item) => $item->product ? $item->product->price * $item->quantity : 0);
-        } else {
-            $cartItems = session()->get('cart', []);
-            return collect($cartItems)->sum(fn($item) => $item['price'] * $item['quantity']);
-        }
-    }
+        $validator = Validator::make($request->all(), [
+            'product_id' => 'required|integer|exists:products,id',
+            'quantity' => 'required|integer|min:1',
+        ], [
+            'product_id.required' => 'Không tìm thấy sản phẩm.',
+            'product_id.integer' => 'Sản phẩm không hợp lệ.',
+            'product_id.exists' => 'Sản phẩm không còn tồn tại.',
+            'quantity.required' => 'Vui lòng chọn số lượng.',
+            'quantity.integer' => 'Số lượng phải là số nguyên lớn hơn 0.',
+            'quantity.min' => 'Số lượng phải là số nguyên lớn hơn 0.',
+        ]);
 
+        if ($validator->fails()) {
+            $productId = filter_var($request->input('product_id'), FILTER_VALIDATE_INT);
+            $product = $productId ? Product::find($productId) : null;
+            $current = Auth::check()
+                ? (int) CartItem::where('user_id', Auth::id())->where('product_id', $productId ?: 0)->sum('quantity')
+                : (int) (session('cart', [])[$productId ?: 0]['quantity'] ?? 0);
+            $message = $validator->errors()->first();
+
+            $response = [
+                'success' => false,
+                'error' => $message,
+                'message' => $message,
+                'code' => $validator->errors()->has('quantity') ? 'invalid_quantity' : 'product_unavailable',
+                'stock' => max(0, (int) ($product?->stock ?? 0)),
+                'cart_quantity' => $current,
+                'errors' => $validator->errors(),
+            ];
+            if ($product) {
+                $issue = CartInventory::issue($product, 1, $product->id);
+                if ($issue) {
+                    $response['stock'] = $issue['stock'];
+                }
+            }
+
+            return response()->json($response + $this->cartResponse(), 422);
+        }
+
+        $productId = (int) $request->input('product_id');
+        $requested = (int) $request->input('quantity');
+        $result = DB::transaction(function () use ($productId, $requested, $adding) {
+            if (Auth::check()) {
+                User::whereKey(Auth::id())->lockForUpdate()->firstOrFail();
+            }
+            $product = Product::whereKey($productId)->lockForUpdate()->first();
+            $rows = Auth::check()
+                ? CartItem::where('user_id', Auth::id())->where('product_id', $productId)->orderBy('id')->lockForUpdate()->get()
+                : collect();
+            $cart = session('cart', []);
+            $current = Auth::check() ? (int) $rows->sum('quantity') : (int) ($cart[$productId]['quantity'] ?? 0);
+
+            if (!$adding && (Auth::check() ? $rows->isEmpty() : !isset($cart[$productId]))) {
+                return ['error' => 'Sản phẩm không tồn tại trong giỏ hàng.', 'message' => 'Sản phẩm không tồn tại trong giỏ hàng.', 'code' => 'cart_item_missing', 'status_code' => 404];
+            }
+
+            $quantity = $adding ? $current + $requested : $requested;
+            $issue = CartInventory::issue($product, $quantity, $productId);
+            if ($issue) {
+                $issue['cart_quantity'] = $current;
+                if ($adding && $current > 0 && $issue['stock'] > 0) {
+                    $issue['message'] .= " Giỏ hàng của bạn đã có {$current} {$issue['unit']} sản phẩm này.";
+                }
+
+                return $issue + ['error' => $issue['message'], 'status_code' => 422];
+            }
+
+            if (Auth::check()) {
+                if ($rows->isNotEmpty()) {
+                    $rows->first()->update(['quantity' => $quantity]);
+                    CartItem::whereIn('id', $rows->skip(1)->pluck('id'))->delete();
+                } else {
+                    CartItem::create(['user_id' => Auth::id(), 'product_id' => $productId, 'quantity' => $quantity]);
+                }
+            } else {
+                $cart[$productId] = [
+                    'product_id' => $productId,
+                    'name' => $product->name,
+                    'price' => $product->price,
+                    'quantity' => $quantity,
+                    'stock' => $product->stock,
+                    'image' => $product->firstImage?->image ?? 'default_product.webp',
+                ];
+                session()->put('cart', $cart);
+            }
+
+            return [
+                'success' => true,
+                'message' => $adding ? 'Thêm vào giỏ hàng thành công' : 'Cập nhật giỏ hàng thành công',
+                'quantity' => $quantity,
+                'subTotal' => number_format($product->price * $quantity, 0, ',', '.'),
+            ];
+        });
+
+        $status = $result['status_code'] ?? 200;
+        unset($result['status_code']);
+
+        return response()->json($result + ['success' => $status === 200] + $this->cartResponse(), $status);
+    }
     //Hanle xóa sản phẩm khỏi giỏ hàng
     public function removeCart(Request $request)
     {
-        $productId = $request->input('product_id');
-        $quantity = (int) $request->input('quantity');
+        $request->validate(['product_id' => 'required|integer|min:1']);
+        $productId = (int) $request->input('product_id');
         if (Auth::check()) {
-            CartItem::where('user_id', Auth::id())->where('product_id', $productId)->delete();
+            DB::transaction(function () use ($productId) {
+                User::whereKey(Auth::id())->lockForUpdate()->firstOrFail();
+                CartItem::where('user_id', Auth::id())->where('product_id', $productId)->delete();
+            });
         } else {
             $cart = session()->get('cart', []);
             unset($cart[$productId]);
             session()->put('cart', $cart);
         }
-        // Cập nhật lại số lượng sản phẩm trong giỏ hàng sau khi xóa
-        $cartCount = Auth::check()
-            ? CartItem::where('user_id', Auth::id())->sum('quantity')
-            : array_sum(array_column(session()->get('cart', []), 'quantity'));
-        // Tính lại tổng số lượng sản phẩm trong giỏ hàng
-        $total = $this->calculateTotalCart();
-        $grandTotal = $total + 15000; // Nếu có phí vận chuyển hoặc thuế, bạn có thể cộng thêm vào đây
+
         return response()->json([
-            'total' => number_format($total, 0, ',', '.'),
-            'grandTotal' => number_format($grandTotal, 0, ',', '.'),
-            'cart_count' => $cartCount,
-        ]);
+            'status' => true,
+            'success' => true,
+            'message' => 'Sản phẩm đã được xóa khỏi giỏ hàng',
+        ] + $this->cartResponse());
     }
 }

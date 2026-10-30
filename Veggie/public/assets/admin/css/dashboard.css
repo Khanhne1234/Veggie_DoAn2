@@ -614,3 +614,30 @@
         padding: 0;
     }
 }
+.revenue-period-form {
+    flex: 0 0 auto;
+    margin: 0;
+}
+
+.revenue-period-select {
+    min-height: 38px;
+    border: 1px solid #e7ebf1;
+    border-radius: 9px;
+    padding: 7px 32px 7px 11px;
+    background: #fff;
+    color: #526174;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.revenue-period-select:focus {
+    outline: 2px solid rgba(22, 163, 74, .2);
+    border-color: #16a34a;
+}
+
+@media (max-width: 575px) {
+    .revenue-period-select {
+        max-width: 126px;
+    }
+}

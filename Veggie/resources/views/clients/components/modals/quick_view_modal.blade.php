@@ -46,7 +46,8 @@
                                                         <div class="dec qtybutton">-</div>
                                                         <input type="text" value="1" name="qtybutton"
                                                             class="cart-plus-minus-box" readonly
-                                                            data-max="{{ $product->stock }}">
+                                                            data-max="{{ $product->stock }}" data-id="{{ $product->id }}"
+                                                            data-name="{{ $product->name }}" data-unit="{{ trim($product->unit ?? '') ?: 'sản phẩm' }}">
                                                         <div class="inc qtybutton">+</div>
                                                     </div>
                                                 </li>

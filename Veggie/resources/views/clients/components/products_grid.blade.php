@@ -3,7 +3,7 @@
          @forelse ($products as $product)
              <div class="col-xl-4 col-sm-6 col-6">
                  <div class="ltn__product-item ltn__product-item-3 text-center">
-                     <div class="product-img">
+                    <div class="product-img {{ (int) $product->stock <= 0 ? 'product-out-of-stock' : '' }}">
                          <a href="{{ route('product.detail', $product->slug) }}">
                              <img src="{{ $product->image_url ?? asset('storage/uploads/products/default_product.webp') }}"
                                  alt="{{ $product->name }}">
@@ -17,7 +17,7 @@
                                      </a>
                                  </li>
                                  <li>
-                                     <a href="javascript:void(0)" title="Thêm vào giỏ hàng" class="add-to-cart-btn"
+                                     <a href="javascript:void(0)" title="Thêm vào giỏ hàng" class="add-to-cart-btn {{ $product->stock <= 0 ? 'product-add-disabled' : '' }}" aria-disabled="{{ $product->stock <= 0 ? 'true' : 'false' }}"
                                          data-id="{{ $product->id }}">
                                          <i class="fas fa-shopping-cart"></i>
                                      </a>
