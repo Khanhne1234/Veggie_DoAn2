@@ -109,7 +109,7 @@
                                                                         </td>
                                                                         <td>
 
-                                                                            <div class="btn-group">
+                                                                            <div class="btn-group dropup">
                                                                                 <button type="button"
                                                                                     class="btn btn-danger dropdown-toggle dropdown-toggle-split"
                                                                                     data-toggle="dropdown"

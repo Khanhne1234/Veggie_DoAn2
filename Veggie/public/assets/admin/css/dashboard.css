@@ -636,6 +636,14 @@
     border-color: #16a34a;
 }
 
+/* Keep every dashboard component square, including cards, badges and controls. */
+.dashboard-page,
+.dashboard-page *,
+.dashboard-page *::before,
+.dashboard-page *::after {
+    border-radius: 0 !important;
+}
+
 @media (max-width: 575px) {
     .revenue-period-select {
         max-width: 126px;

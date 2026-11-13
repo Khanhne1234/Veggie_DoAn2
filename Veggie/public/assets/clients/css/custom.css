@@ -414,6 +414,14 @@
     text-align: center;
 }
 
+/* Keep the order details square without changing other client pages. */
+.order-detail-page,
+.order-detail-page *,
+.order-detail-page *::before,
+.order-detail-page *::after {
+    border-radius: 0 !important;
+}
+
 @media (max-width: 991.98px) {
     .order-detail-page .order-summary-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));

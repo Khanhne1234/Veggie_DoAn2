@@ -57,7 +57,7 @@ a {
   overflow: hidden;
   background: var(--white);
   border: 1px solid rgba(29, 91, 58, 0.12);
-  border-radius: 30px;
+  border-radius: 0;
   box-shadow: 0 26px 80px rgba(30, 64, 44, 0.16);
 }
 
@@ -558,7 +558,7 @@ a {
     display: block;
     max-width: 520px;
     margin: 0 auto;
-    border-radius: 24px;
+    border-radius: 0;
   }
 
   .auth-showcase {

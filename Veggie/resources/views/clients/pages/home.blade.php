@@ -243,7 +243,7 @@
                 <div class="col-lg-12">
                     <div class="ltn__banner-item ltn__banner-style-4 text-color-white bg-image"
                         data-bg="{{ asset('assets/clients/img/bg/15.jpg') }}"
-                        style="background-size: cover; background-position: center; border-radius: 15px; overflow: hidden; position: relative;">
+                        style="background-size: cover; background-position: center; border-radius: 0; overflow: hidden; position: relative;">
                         <div class="ltn__banner-info-wrap bg-overlay-theme-black-60 pt-80 pb-80 pl-50 pr-50 text-center"
                             style="position: relative; z-index: 1; backdrop-filter: blur(1px);">
                             <h6 class="slide-sub-title ltn__secondary-color"
