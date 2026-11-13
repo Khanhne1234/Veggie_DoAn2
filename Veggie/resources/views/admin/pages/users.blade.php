@@ -107,36 +107,34 @@
                                             <div class="col-sm-4 emphasis">
                                             </div>
                                             <div class=" col-sm-10 emphasis">
-                                                @if ($user->role->name == 'customer')
-                                                    <button type="button" class="btn btn-primary btn-sm upgradeStaff"
-                                                        data-userid="{{ $user->id }}">
-                                                        <i class="fa fa-user"> </i> Nhân viên
-                                                    </button>
-                                                    @if ($user->status == 'banned')
-                                                        <button type="button" class="btn btn-success btn-sm changeStatus"
-                                                            data-userid="{{ $user->id }}" data-status="active"
-                                                            data-action="block">
-                                                            <i class="fa fa-user"> </i> Bỏ chặn
+                                                @if (in_array($user->role->name, ['customer', 'staff'], true))
+                                                    @if ($user->status !== 'deleted')
+                                                        <button type="button" class="btn btn-primary btn-sm changeUserRole"
+                                                            data-userid="{{ $user->id }}"
+                                                            data-role="{{ $user->role->name === 'customer' ? 'staff' : 'customer' }}"
+                                                            data-url="{{ route('admin.user.updateRole') }}">
+                                                            <i class="fa fa-user"></i>
+                                                            {{ $user->role->name === 'customer' ? 'Nhân viên' : 'Khách hàng' }}
                                                         </button>
-                                                    @else
-                                                        <button type="button" class="btn btn-warning btn-sm changeStatus"
-                                                            data-userid="{{ $user->id }}" data-status="banned"
-                                                            data-action="block">
-                                                            <i class="fa fa-user"> </i> Chặn
-                                                        </button>
-                                                    @endif
-
-                                                    @if ($user->status == 'deleted')
-                                                        <button type="button" class="btn btn-success btn-sm changeStatus"
-                                                            data-userid="{{ $user->id }}" data-status="active"
-                                                            data-action="delete">
-                                                            <i class="fa fa-user"> </i> Khôi phục
-                                                        </button>
-                                                    @else
+                                                        @if ($user->status === 'banned')
+                                                            <button type="button" class="btn btn-success btn-sm changeStatus"
+                                                                data-userid="{{ $user->id }}" data-status="active">
+                                                                <i class="fa fa-unlock"></i> Bỏ chặn
+                                                            </button>
+                                                        @else
+                                                            <button type="button" class="btn btn-warning btn-sm changeStatus"
+                                                                data-userid="{{ $user->id }}" data-status="banned">
+                                                                <i class="fa fa-ban"></i> Chặn
+                                                            </button>
+                                                        @endif
                                                         <button type="button" class="btn btn-danger btn-sm changeStatus"
-                                                            data-userid="{{ $user->id }}" data-status="deleted"
-                                                            data-action="delete">
-                                                            <i class="fa fa-user"> </i> Xóa
+                                                            data-userid="{{ $user->id }}" data-status="deleted">
+                                                            <i class="fa fa-trash"></i> Xóa
+                                                        </button>
+                                                    @else
+                                                        <button type="button" class="btn btn-success btn-sm changeStatus"
+                                                            data-userid="{{ $user->id }}" data-status="active">
+                                                            <i class="fa fa-undo"></i> Khôi phục
                                                         </button>
                                                     @endif
                                                 @endif

@@ -33,7 +33,7 @@ Route::prefix('admin')->group(function () {
 
         Route::middleware(['check.permission:manage_users'])->group(function () {
             Route::get('/users', [UsersController::class, 'index'])->name('admin.users');
-            Route::post('/user/upgrade', [UsersController::class, 'upgrade'])->name('admin.user.upgrade');
+            Route::post('/user/update-role', [UsersController::class, 'updateRole'])->name('admin.user.updateRole');
             Route::post('/user/updateStatus', [UsersController::class, 'updateStatus'])->name('admin.user.updateStatus');
         });
         Route::middleware(['check.permission:manage_categories'])->group(function () {

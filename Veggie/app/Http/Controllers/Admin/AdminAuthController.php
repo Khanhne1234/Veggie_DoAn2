@@ -21,7 +21,8 @@ class AdminAuthController extends Controller
         if (Auth::guard('admin')->attempt(['email' => $request->email, 'password' => $request->password])) {
             $user = Auth::guard('admin')->user();
             //check permission
-            if ($user->role && in_array($user->role->name, ['admin', 'staff'])) { //only allow admin and manager
+            if ($user->role && in_array($user->role->name, ['admin', 'staff'], true)
+                && !in_array($user->status, ['banned', 'deleted', 'suspended'], true)) {
                 $request->session()->regenerate();
                 return redirect()->intended(route('admin.dashboard'))->with('toastr', [
                     'type' => 'success',

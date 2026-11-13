@@ -38,27 +38,46 @@ class UsersController extends Controller
 
         return view('admin.pages.users', compact('users', 'roles'));
     }
-    public function upgrade(Request $request)
+    public function updateRole(Request $request)
     {
-        $userId = $request->user_id;
-        $user = User::find($userId);
-        if (!$user) {
-            return response()->json(['success' => false, 'message' => 'Không tìm thấy người dùng']);
+        $data = $request->validate([
+            'user_id' => ['required', 'integer', 'exists:users,id'],
+            'role' => ['required', 'in:staff,customer'],
+        ]);
+
+        $user = User::with('role')->findOrFail($data['user_id']);
+        if ($user->role?->name === 'admin' || $user->id === $request->user('admin')?->id) {
+            return response()->json(['success' => false, 'message' => 'Không thể đổi vai trò tài khoản quản trị.'], 403);
         }
-        $user->role_id = 2;
-        $user->save();
-        return response()->json(['success' => true, 'message' => 'Đã nâng cấp người dùng thành công']);
+        if (!in_array($user->role?->name, ['customer', 'staff'], true) || $user->status === 'deleted') {
+            return response()->json(['success' => false, 'message' => 'Tài khoản không thể đổi vai trò lúc này.'], 422);
+        }
+
+        $role = Role::where('name', $data['role'])->firstOrFail();
+        $user->update(['role_id' => $role->id]);
+
+        return response()->json([
+            'success' => true,
+            'message' => $role->name === 'staff' ? 'Đã nâng lên nhân viên.' : 'Đã hạ xuống khách hàng.',
+        ]);
     }
     public function updateStatus(Request $request)
     {
-        $userId = $request->user_id;
-        $status = $request->status;
-        $user = User::find($userId);
-        if (!$user) {
-            return response()->json(['success' => false, 'message' => 'Không tìm thấy người dùng']);
+        $data = $request->validate([
+            'user_id' => ['required', 'integer', 'exists:users,id'],
+            'status' => ['required', 'in:active,banned,deleted'],
+        ]);
+
+        $user = User::with('role')->findOrFail($data['user_id']);
+        if ($user->role?->name === 'admin' || $user->id === $request->user('admin')?->id) {
+            return response()->json(['success' => false, 'message' => 'Không thể thay đổi trạng thái tài khoản quản trị.'], 403);
         }
-        $user->status = $status;
-        $user->save();
-        return response()->json(['success' => true, 'message' => 'Đã cập nhật trạng thái người dùng thành công']);
+        if (!in_array($user->role?->name, ['customer', 'staff'], true)) {
+            return response()->json(['success' => false, 'message' => 'Vai trò tài khoản không hợp lệ.'], 422);
+        }
+
+        $user->update(['status' => $data['status']]);
+
+        return response()->json(['success' => true, 'message' => 'Đã cập nhật trạng thái người dùng.']);
     }
 }

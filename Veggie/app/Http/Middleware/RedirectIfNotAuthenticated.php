@@ -23,6 +23,15 @@ class RedirectIfNotAuthenticated
                     'message' => 'Vui lòng đăng nhập để truy cập trang quản trị',
                 ]);
             }
+            $admin = Auth::guard('admin')->user()->fresh(['role']);
+            if (!$admin || !in_array($admin->role?->name, ['admin', 'staff'], true)
+                || in_array($admin->status, ['banned', 'deleted', 'suspended'], true)) {
+                Auth::guard('admin')->logout();
+                return redirect()->route('admin.login')->with('toastr', [
+                    'type' => 'error',
+                    'message' => 'Tài khoản không còn quyền truy cập trang quản trị.',
+                ]);
+            }
         } elseif (!Auth::guard('web')->check()) {
             return redirect()->route('login')->with('toastr', [
                 'type' => 'error',

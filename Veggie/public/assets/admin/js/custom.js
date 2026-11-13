@@ -3,32 +3,37 @@ $(document).ready(function () {
   * *Management Users
   * **************************/
 
-    $(document).on('click', '.upgradeStaff', function (e) {
+    $(document).on('click', '.changeUserRole', function (e) {
+        e.preventDefault();
         let button = $(this);
         let userId = button.data('userid');
+        let role = button.data('role');
+        let confirmation = role === 'staff'
+            ? 'Nâng tài khoản này lên nhân viên?'
+            : 'Hạ nhân viên này xuống khách hàng?';
+        if (!window.confirm(confirmation)) return;
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
         $.ajax({
-            url: '/admin/user/upgrade',
+            url: button.data('url'),
             type: 'POST',
             data: {
-                user_id: userId
+                user_id: userId,
+                role: role
             },
             success: function (response) {
                 if (response.success) {
                     toastr.success(response.message);
-                    button.closest('.profile_view').find('.brief i').text('Staff');
-                    button.closest('.profile_view').find('.changeStatus').hide();
-                    button.hide();
+                    window.setTimeout(function () { window.location.reload(); }, 500);
                 } else {
                     toastr.error(response.message);
                 }
             },
-            error: function (xhr, status, error) {
-                toastr.error('Đã có lỗi xảy ra');
+            error: function (xhr) {
+                toastr.error(xhr.responseJSON?.message || 'Đã có lỗi xảy ra');
             }
         });
     });
@@ -37,6 +42,7 @@ $(document).ready(function () {
         let button = $(this);
         let userId = button.data('userid');
         let status = button.data('status');
+        if (status === 'deleted' && !window.confirm('Xóa tài khoản này? Bạn có thể khôi phục sau.')) return;
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -52,39 +58,13 @@ $(document).ready(function () {
             success: function (response) {
                 if (response.success) {
                     toastr.success(response.message);
-                    let action = button.data('action');
-
-                    if (status == "banned") {
-                        // Chặn thành công → hiển thị nút "Bỏ chặn"
-                        button.replaceWith(
-                            '<button type="button" class="btn btn-success btn-sm changeStatus" data-userid="' + userId + '" data-status="active" data-action="block">' +
-                            '<i class="fa fa-user"> </i> Bỏ chặn</button>'
-                        );
-                    } else if (status == "deleted") {
-                        // Xóa thành công → hiển thị nút "Khôi phục"
-                        button.replaceWith(
-                            '<button type="button" class="btn btn-success btn-sm changeStatus" data-userid="' + userId + '" data-status="active" data-action="delete">' +
-                            '<i class="fa fa-user"> </i> Khôi phục</button>'
-                        );
-                    } else if (status == "active" && action == "block") {
-                        // Bỏ chặn thành công → hiển thị nút "Chặn"
-                        button.replaceWith(
-                            '<button type="button" class="btn btn-warning btn-sm changeStatus" data-userid="' + userId + '" data-status="banned" data-action="block">' +
-                            '<i class="fa fa-user"> </i> Chặn</button>'
-                        );
-                    } else if (status == "active" && action == "delete") {
-                        // Khôi phục thành công → hiển thị nút "Xóa"
-                        button.replaceWith(
-                            '<button type="button" class="btn btn-danger btn-sm changeStatus" data-userid="' + userId + '" data-status="deleted" data-action="delete">' +
-                            '<i class="fa fa-user"> </i> Xóa</button>'
-                        );
-                    }
+                    window.setTimeout(function () { window.location.reload(); }, 500);
                 } else {
                     toastr.error(response.message);
                 }
             },
-            error: function (xhr, status, error) {
-                toastr.error('Đã có lỗi xảy ra');
+            error: function (xhr) {
+                toastr.error(xhr.responseJSON?.message || 'Đã có lỗi xảy ra');
             }
         });
     });
