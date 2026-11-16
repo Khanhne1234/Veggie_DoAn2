@@ -21,10 +21,10 @@
                     <h1>Tổng quan cửa hàng</h1>
                     <p>Theo dõi nhanh tình hình kinh doanh và các hoạt động mới nhất.</p>
                 </div>
-                <div class="dashboard-date" aria-label="Ngày hiện tại">
+                {{-- <div class="dashboard-date" aria-label="Ngày hiện tại">
                     <i class="fa fa-calendar-o" aria-hidden="true"></i>
                     <span>{{ now()->format('d/m/Y') }}</span>
-                </div>
+                </div> --}}
             </header>
 
             <section class="dashboard-stats" aria-label="Chỉ số tổng quan">
@@ -106,9 +106,9 @@
                             <span class="dashboard-panel__eyebrow">Phân bổ</span>
                             <h2>Danh mục nổi bật</h2>
                         </div>
-                        <span class="dashboard-panel__icon dashboard-panel__icon--blue" aria-hidden="true">
+                        {{-- <span class="dashboard-panel__icon dashboard-panel__icon--blue" aria-hidden="true">
                             <i class="fa fa-pie-chart"></i>
-                        </span>
+                        </span> --}}
                     </div>
 
                     <div class="dashboard-panel__body category-overview">
@@ -151,7 +151,7 @@
                             <span class="dashboard-panel__eyebrow">Hiệu suất</span>
                             <h2>Sản phẩm bán chạy</h2>
                         </div>
-                        <span class="dashboard-count-pill">Top {{ $topSellingProducts->count() }}</span>
+                        {{-- <span class="dashboard-count-pill">Top {{ $topSellingProducts->count() }}</span> --}}
                     </div>
 
                     <div class="dashboard-panel__body dashboard-panel__body--table">

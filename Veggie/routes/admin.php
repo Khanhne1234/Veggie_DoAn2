@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\AccountController;
 use App\Http\Middleware\DefaultAdminData;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\LiveUpdateController;
 
 
 Route::prefix('admin')->group(function () {
@@ -22,6 +23,7 @@ Route::prefix('admin')->group(function () {
     });
 
     Route::middleware(['auth.custom', DefaultAdminData::class])->group(function () {
+        Route::get('/live-update', LiveUpdateController::class)->name('admin.live-update');
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
         Route::get('/profile', [AccountController::class, 'index'])->name('admin.profile');

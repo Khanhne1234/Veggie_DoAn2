@@ -151,6 +151,40 @@
             positionClass: 'toast-top-right'
         };
     </script>
+    <script>
+        (() => {
+            const current = {
+                orders: @json(\App\Models\Order::max('id')),
+                contacts: @json(\App\Models\Contact::max('id'))
+            };
+            let checking = false;
+
+            window.setInterval(async () => {
+                if (checking || document.hidden) return;
+                checking = true;
+
+                try {
+                    const response = await fetch(@json(route('admin.live-update')), {
+                        headers: { 'Accept': 'application/json' },
+                        credentials: 'same-origin'
+                    });
+                    if (!response.ok) return;
+
+                    const latest = await response.json();
+                    const hasNewOrder = latest.latest_order_id !== current.orders;
+                    const hasNewContact = latest.latest_contact_id !== current.contacts;
+
+                    if (hasNewOrder || hasNewContact) {
+                        window.location.reload();
+                    }
+                } catch (error) {
+                    // A later poll will retry if the connection is temporarily unavailable.
+                } finally {
+                    checking = false;
+                }
+            }, 5000);
+        })();
+    </script>
     @if (session('success'))
         <script>
             toastr.success(@json(session('success')));

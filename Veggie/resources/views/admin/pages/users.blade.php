@@ -114,7 +114,7 @@
                                                             data-role="{{ $user->role->name === 'customer' ? 'staff' : 'customer' }}"
                                                             data-url="{{ route('admin.user.updateRole') }}">
                                                             <i class="fa fa-user"></i>
-                                                            {{ $user->role->name === 'customer' ? 'Nhân viên' : 'Khách hàng' }}
+                                                            {{ $user->role->name === 'customer' ? 'Khách hàng' : 'Nhân viên' }}
                                                         </button>
                                                         @if ($user->status === 'banned')
                                                             <button type="button" class="btn btn-success btn-sm changeStatus"
