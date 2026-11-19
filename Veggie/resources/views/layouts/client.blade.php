@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js" lang="zxx">
+<html class="no-js" lang="vi">
 
 
 
@@ -22,6 +22,7 @@
     <link rel="stylesheet" href="{{ asset('assets/clients/css/style.css') }}">
     <!-- Responsive css -->
     <link rel="stylesheet" href="{{ asset('assets/clients/css/responsive.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/clients/css/custom.css') }}">
 
     <!-- Toastr css -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
@@ -61,8 +62,6 @@
     <script src="{{ asset('assets/clients/js/main.js') }}"></script>
     <!-- Toastr JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-    <!--Import custom CSS -->
-    <link rel="stylesheet" href="{{ asset('assets/clients/css/custom.css') }}">
     @if (session('toastr'))
         @php
             $toast = session('toastr');

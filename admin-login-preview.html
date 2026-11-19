@@ -1,0 +1,55 @@
+<div id="veggie-admin-login-preview" class="viz-carousel" aria-label="Mẫu trang đăng nhập quản trị" data-previous-label="Mẫu trước" data-next-label="Mẫu sau">
+  <section data-variant="Tối giản" aria-label="Mẫu đăng nhập tối giản">
+    <div class="veg-stage veg-stage-soft">
+      <div class="veg-login-card">
+        <div class="veg-brand"><span class="veg-brand-mark">◆</span><span>Veggie Shop</span></div>
+        <h1>Đăng nhập quản trị</h1>
+        <p class="veg-subtitle">Chào mừng bạn quay lại</p>
+        <form class="veg-form" onsubmit="return false">
+          <label for="veg-email-a">Email</label>
+          <input id="veg-email-a" type="email" placeholder="admin@example.com" autocomplete="username">
+          <label for="veg-password-a">Mật khẩu</label>
+          <input id="veg-password-a" type="password" placeholder="Nhập mật khẩu" autocomplete="current-password">
+          <button type="submit">Đăng nhập <span aria-hidden="true">→</span></button>
+        </form>
+        <a href="#" onclick="return false">← Về cửa hàng</a>
+      </div>
+    </div>
+  </section>
+  <section data-variant="Xanh thương hiệu" aria-label="Mẫu đăng nhập nền xanh thương hiệu" hidden>
+    <div class="veg-stage veg-stage-green">
+      <div class="veg-login-card veg-login-card-green">
+        <div class="veg-brand"><span class="veg-brand-mark">◆</span><span>Veggie Shop</span></div>
+        <div class="veg-kicker">KHU VỰC QUẢN TRỊ</div>
+        <h1>Đăng nhập</h1>
+        <form class="veg-form" onsubmit="return false">
+          <label for="veg-email-b">Email</label>
+          <input id="veg-email-b" type="email" placeholder="admin@example.com" autocomplete="username">
+          <label for="veg-password-b">Mật khẩu</label>
+          <input id="veg-password-b" type="password" placeholder="Nhập mật khẩu" autocomplete="current-password">
+          <button type="submit">Vào trang quản trị <span aria-hidden="true">→</span></button>
+        </form>
+        <a href="#" onclick="return false">← Về cửa hàng</a>
+      </div>
+    </div>
+  </section>
+</div>
+<style>
+  #veggie-admin-login-preview .veg-stage{min-height:560px;display:flex;align-items:center;justify-content:center;padding:36px 18px;box-sizing:border-box;font-family:Arial,Helvetica,sans-serif;color:#17362a}
+  #veggie-admin-login-preview .veg-stage-soft{background:linear-gradient(145deg,#f4f8ed,#e9f3ec)}
+  #veggie-admin-login-preview .veg-stage-green{background:radial-gradient(circle at 15% 20%,#287b4d,#093f2d 65%)}
+  #veggie-admin-login-preview .veg-login-card{box-sizing:border-box;width:min(100%,430px);padding:42px;background:#fff;border:1px solid #e4eade;border-radius:16px;box-shadow:0 16px 45px rgba(20,64,41,.09)}
+  #veggie-admin-login-preview .veg-login-card-green{border:0;box-shadow:0 22px 55px rgba(0,25,12,.2)}
+  #veggie-admin-login-preview .veg-brand{display:flex;align-items:center;gap:10px;margin-bottom:38px;font-size:20px;font-weight:700;letter-spacing:-.02em}
+  #veggie-admin-login-preview .veg-brand-mark{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:9px;background:#c9ef65;color:#0e492e;font-size:20px}
+  #veggie-admin-login-preview h1{font-size:26px;line-height:1.2;margin:0 0 8px;font-weight:700;color:#17362a}
+  #veggie-admin-login-preview .veg-subtitle{font-size:14px;color:#718078;margin:0 0 30px}
+  #veggie-admin-login-preview .veg-kicker{font-size:11px;font-weight:700;letter-spacing:.14em;color:#4d865c;margin-bottom:9px}
+  #veggie-admin-login-preview .veg-form{display:flex;flex-direction:column;gap:9px;margin-top:26px}
+  #veggie-admin-login-preview label{font-size:13px;font-weight:700;color:#274338}
+  #veggie-admin-login-preview input{box-sizing:border-box;width:100%;height:46px;padding:0 14px;margin-bottom:14px;border:1px solid #dce6dc;border-radius:8px;background:#f8faf7;color:#17362a;font:inherit;font-size:14px}
+  #veggie-admin-login-preview input:focus{outline:2px solid #91bd84;outline-offset:1px}
+  #veggie-admin-login-preview button{height:48px;margin-top:4px;border:0;border-radius:8px;background:#287a48;color:#fff;font:inherit;font-size:14px;font-weight:700;display:flex;justify-content:center;align-items:center;gap:8px}
+  #veggie-admin-login-preview a{display:block;width:max-content;margin:27px auto 0;color:#31754d;text-decoration:none;font-size:13px;font-weight:600}
+  @media(max-width:480px){#veggie-admin-login-preview .veg-stage{min-height:550px;padding:24px 12px}#veggie-admin-login-preview .veg-login-card{padding:30px 23px}#veggie-admin-login-preview .veg-brand{margin-bottom:28px}}
+</style>

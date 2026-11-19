@@ -18,7 +18,7 @@
                                         <select name="address_id" id="list_address" class="input-item w-100">
                                             @forelse ($addresses as $address)
                                                 <option value="{{ $address->id }}"
-                                                    {{ $address->default ? 'selected' : '' }}>
+                                                    {{ $defaultAddress?->id === $address->id ? 'selected' : '' }}>
                                                     {{ $address->full_name }} - {{ $address->city }}
                                                 </option>
                                             @empty
@@ -27,7 +27,7 @@
                                         </select>
                                     </div>
                                     <div class="col-lg-5 text-lg-end">
-                                        <a href="{{ route('account') }}"
+                                        <a href="{{ route('account', ['return_to' => 'checkout']) }}"
                                             class="btn theme-btn-1 btn-effect-1 text-uppercase px-4 py-2"
                                             style="width: fit-content; min-width: 180px;">
                                             Thêm địa chỉ mới

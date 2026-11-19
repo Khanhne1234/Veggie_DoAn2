@@ -14,11 +14,11 @@
                                 <div class="col-lg-4">
                                     <div class="ltn__tab-menu-list mb-50">
                                         <div class="nav">
-                                            <a class="active show" data-bs-toggle="tab" href="#liton_tab_dashboard">Bảng
+                                            <a class="{{ request('return_to') === 'checkout' ? '' : 'active show' }}" data-bs-toggle="tab" href="#liton_tab_dashboard">Bảng
                                                 điều khiển <i class="fas fa-home"></i></a>
                                             <a data-bs-toggle="tab" href="#liton_tab_orders">Đơn hàng <i
                                                     class="fas fa-file-alt"></i></a>
-                                            <a data-bs-toggle="tab" href="#liton_tab_addresses">Địa chỉ <i
+                                            <a class="{{ request('return_to') === 'checkout' ? 'active show' : '' }}" data-bs-toggle="tab" href="#liton_tab_addresses">Địa chỉ <i
                                                     class="fas fa-map-marker-alt"></i></a>
                                             <a data-bs-toggle="tab" href="#liton_tab_account">Thông tin tài khoản <i
                                                     class="fas fa-user"></i></a>
@@ -29,7 +29,7 @@
                                 </div>
                                 <div class="col-lg-8">
                                     <div class="tab-content">
-                                        <div class="tab-pane fade active show" id="liton_tab_dashboard">
+                                        <div class="tab-pane fade {{ request('return_to') === 'checkout' ? '' : 'active show' }}" id="liton_tab_dashboard">
                                             <div class="ltn__myaccount-tab-content-inner">
                                                 <p>Xin chào <strong>{{ $user->name }}</strong> (không phải là
                                                     <strong>{{ $user->email }}</strong>?
@@ -89,8 +89,11 @@
                                             </div>
                                         </div>
 
-                                        <div class="tab-pane fade" id="liton_tab_addresses">
+                                        <div class="tab-pane fade {{ request('return_to') === 'checkout' ? 'active show' : '' }}" id="liton_tab_addresses">
                                             <div class="ltn__myaccount-tab-content-inner">
+                                                @if (request('return_to') === 'checkout')
+                                                    <a href="{{ route('checkout') }}" class="btn btn-outline-secondary mb-3">Quay lại thanh toán</a>
+                                                @endif
                                                 <p>Các địa chỉ sau sẽ được sử dụng mặc định trên trang thanh toán.</p>
                                                 <div class="table-responsive">
                                                     <table class="table">
@@ -261,6 +264,9 @@
                                                         <form action="{{ route('account.address.add') }}" method="POST"
                                                             id="addAddressForm">
                                                             @csrf
+                                                            @if (request('return_to') === 'checkout')
+                                                                <input type="hidden" name="return_to" value="checkout">
+                                                            @endif
                                                             <div class="mb-3">
                                                                 <label for="full_name" class="form-label">Tên người
                                                                     dùng:</label>

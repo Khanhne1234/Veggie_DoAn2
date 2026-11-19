@@ -109,13 +109,14 @@ class AccountController extends Controller
             'address' => 'required|string|max:255',
             'city' => 'required|string|max:255',
             'default' => 'nullable|boolean',
+            'return_to' => 'nullable|in:checkout',
         ]);
 
         //if the new address is set as default, update the order address default = 0
         if ($request->boolean('default')) {
             ShippingAddress::where('user_id', Auth::id())->update(['default' => false]);
         }
-        ShippingAddress::create([
+        $address = ShippingAddress::create([
             'user_id' => Auth::id(),
             'full_name' => $request->input('full_name'),
             'phone' => $request->input('phone'),
@@ -123,7 +124,13 @@ class AccountController extends Controller
             'city' => $request->input('city'),
             'default' => $request->boolean('default'),
         ]);
-        return response()->json(['success' => true, 'message' => 'Địa chỉ đã được thêm thành công.']);
+        return response()->json([
+            'success' => true,
+            'message' => 'Địa chỉ đã được thêm thành công.',
+            'redirect_url' => $request->input('return_to') === 'checkout'
+                ? route('checkout', ['address_id' => $address->id])
+                : null,
+        ]);
     }
 
     public function updateAddress(Request $request, $id)

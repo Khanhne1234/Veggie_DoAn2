@@ -398,9 +398,13 @@ $(document).ready(function () {
                         modalInstance.hide();
                     }
 
-                    setTimeout(function () {
-                        window.location.reload();
-                    }, 600);
+                    if (response.redirect_url) {
+                        window.location.assign(response.redirect_url);
+                    } else {
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 600);
+                    }
                 }
             },
             error: function (xhr) {
@@ -644,7 +648,6 @@ $(document).ready(function () {
                     $("#ltn__utilize-cart-menu .ltn__utilize-menu-inner").html(
                         response.html,
                     );
-                    $("#ltn__utilize-cart-menu").addClass("ltn__utilize-open");
                 } else {
                     toastr.error("Lỗi khi cập nhật giỏ hàng!", "Lỗi", {
                         timeOut: 5000,
@@ -655,11 +658,6 @@ $(document).ready(function () {
                 }
             },
         });
-    });
-    //Đóng mini cart
-    $(document).on("click", ".ltn__utilize-close", function () {
-        $("#ltn__utilize-cart-menu").removeClass("ltn__utilize-open");
-        $(".ltn__utilize-overlay").hide();
     });
     //Xóa sản phẩm khỏi giỏ hàng
     $(document).on("click", ".mini-cart-item-delete", function () {

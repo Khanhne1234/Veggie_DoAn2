@@ -1,16 +1,16 @@
 <!-- Utilize Mobile Menu Start -->
-<div id="ltn__utilize-mobile-menu" class="ltn__utilize ltn__utilize-mobile-menu">
+<div id="ltn__utilize-mobile-menu" class="ltn__utilize ltn__utilize-mobile-menu" role="dialog" aria-modal="true" aria-label="Menu điều hướng" tabindex="-1" inert>
     <div class="ltn__utilize-menu-inner ltn__scrollbar">
         <div class="ltn__utilize-menu-head">
             <div class="site-logo">
                 <a href="{{ route('home') }}"><img src="{{ asset('assets/clients/img/logo.png') }}" alt="Logo"></a>
             </div>
-            <button class="ltn__utilize-close">×</button>
+            <button type="button" class="ltn__utilize-close" aria-label="Đóng menu">×</button>
         </div>
         <div class="ltn__utilize-menu-search-form">
-            <form action="#">
-                <input type="text" placeholder="Search...">
-                <button><i class="fas fa-search"></i></button>
+            <form action="{{ route('search') }}" method="GET" role="search">
+                <input type="text" name="keyword" placeholder="Tìm kiếm sản phẩm..." aria-label="Tìm kiếm sản phẩm" value="{{ request('keyword') }}">
+                <button type="submit" aria-label="Tìm kiếm"><i class="fas fa-search" aria-hidden="true"></i></button>
             </form>
         </div>
         <div class="ltn__utilize-menu">
@@ -24,14 +24,14 @@
                         <li><a href="{{ url('/faq') }}">FAQ</a></li>
                     </ul>
                 </li>
-                <li><a href="{{ url('/shop') }}">Cửa hàng</a></li>
-                <li><a href="{{ url('/contact') }}">Liên hệ</a></li>
+                <li><a href="{{ route('products.index') }}">Cửa hàng</a></li>
+                <li><a href="{{ route('contact.index') }}">Liên hệ</a></li>
             </ul>
         </div>
         <div class="ltn__utilize-buttons ltn__utilize-buttons-2">
             <ul>
                 <li>
-                    <a href="{{ url('/account') }}" title="Tài khoản">
+                    <a href="{{ route('account') }}" title="Tài khoản">
                         <span class="utilize-btn-icon">
                             <i class="far fa-user"></i>
                         </span>
@@ -39,19 +39,17 @@
                     </a>
                 </li>
                 <li>
-                    <a href="{{ url('/wishlist') }}" title="Yêu thích">
+                    <a href="{{ route('wishlist') }}" title="Yêu thích">
                         <span class="utilize-btn-icon">
                             <i class="far fa-heart"></i>
-                            <sup>3</sup>
                         </span>
                         Yêu thích
                     </a>
                 </li>
                 <li>
-                    <a href="{{ url('/cart') }}" title="Giỏ hàng">
+                    <a href="{{ route('cart') }}" title="Giỏ hàng">
                         <span class="utilize-btn-icon">
                             <i class="fas fa-shopping-cart"></i>
-                            <sup>5</sup>
                         </span>
                         Giỏ hàng
                     </a>

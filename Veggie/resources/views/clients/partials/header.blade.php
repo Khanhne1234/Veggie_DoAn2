@@ -85,7 +85,7 @@
                             </div>
                             <!-- mini-cart -->
                             <div class="mini-cart-icon">
-                                <a href="#ltn__utilize-cart-menu" class="ltn__utilize-toggle">
+                                <a href="#ltn__utilize-cart-menu" class="ltn__utilize-toggle" aria-label="Mở giỏ hàng" aria-controls="ltn__utilize-cart-menu" aria-expanded="false">
                                     <i class="icon-shopping-cart"></i>
                                     <sup id="cart_count">
                                         @auth
@@ -99,7 +99,7 @@
                             <!-- mini-cart -->
                             <!-- Mobile Menu Button -->
                             <div class="mobile-menu-toggle d-xl-none">
-                                <a href="#ltn__utilize-mobile-menu" class="ltn__utilize-toggle">
+                                <a href="#ltn__utilize-mobile-menu" class="ltn__utilize-toggle" aria-label="Mở menu" aria-controls="ltn__utilize-mobile-menu" aria-expanded="false">
                                     <svg viewBox="0 0 800 600">
                                         <path
                                             d="M300,220 C300,220 520,220 540,220 C740,220 640,540 520,420 C440,340 300,200 300,200"
@@ -120,7 +120,7 @@
         </header>
         <!-- HEADER AREA END -->
         <!-- Utilize Cart Menu Start -->
-        <div id="ltn__utilize-cart-menu" class="ltn__utilize ltn__utilize-cart-menu">
+        <div id="ltn__utilize-cart-menu" class="ltn__utilize ltn__utilize-cart-menu" role="dialog" aria-modal="true" aria-label="Giỏ hàng" tabindex="-1" inert>
             <div class="ltn__utilize-menu-inner ltn__scrollbar">
 
             </div>

@@ -111,7 +111,7 @@
                               </div>
                               <!-- mini-cart -->
                               <div class="mini-cart-icon">
-                                  <a href="#ltn__utilize-cart-menu" class="ltn__utilize-toggle">
+                                  <a href="#ltn__utilize-cart-menu" class="ltn__utilize-toggle" aria-label="Mở giỏ hàng" aria-controls="ltn__utilize-cart-menu" aria-expanded="false">
                                       <i class="icon-shopping-cart"></i>
                                       <sup id="cart_count">
                                           @auth
@@ -125,7 +125,7 @@
                               <!-- mini-cart -->
                               <!-- Mobile Menu Button -->
                               <div class="mobile-menu-toggle d-xl-none">
-                                  <a href="#ltn__utilize-mobile-menu" class="ltn__utilize-toggle">
+                                  <a href="#ltn__utilize-mobile-menu" class="ltn__utilize-toggle" aria-label="Mở menu" aria-controls="ltn__utilize-mobile-menu" aria-expanded="false">
                                       <svg viewBox="0 0 800 600">
                                           <path
                                               d="M300,220 C300,220 520,220 540,220 C740,220 640,540 520,420 C440,340 300,200 300,200"
@@ -148,7 +148,7 @@
           <!-- HEADER AREA END -->
 
           <!-- Utilize Cart Menu Start -->
-          <div id="ltn__utilize-cart-menu" class="ltn__utilize ltn__utilize-cart-menu">
+          <div id="ltn__utilize-cart-menu" class="ltn__utilize ltn__utilize-cart-menu" role="dialog" aria-modal="true" aria-label="Giỏ hàng" tabindex="-1" inert>
               <div class="ltn__utilize-menu-inner ltn__scrollbar">
 
 
@@ -156,75 +156,5 @@
           </div>
           <!-- Utilize Cart Menu End -->
 
-          <!-- Utilize Mobile Menu Start -->
-          <div id="ltn__utilize-mobile-menu" class="ltn__utilize ltn__utilize-mobile-menu">
-              <div class="ltn__utilize-menu-inner ltn__scrollbar">
-                  <div class="ltn__utilize-menu-head">
-                      <div class="site-logo">
-                          <a href="{{ route('home') }}"><img src="{{ asset('assets/clients/img/logo.png') }}"
-                                  alt="Logo"></a>
-                      </div>
-                      <button class="ltn__utilize-close">×</button>
-                  </div>
-                  <div class="ltn__utilize-menu-search-form">
-                      <form action="#">
-                          <input type="text" placeholder="Search...">
-                          <button><i class="fas fa-search"></i></button>
-                      </form>
-                  </div>
-                  <div class="ltn__utilize-menu">
-                      <ul>
-                          <li><a href="{{ route('home') }}">Trang chủ</a> </li>
-                          <li><a href="{{ url('/about') }}">Về chúng tôi</a>
-                              <ul class="sub-menu">
-                                  <li><a href="{{ url('/about') }}">Về chúng tôi</a></li>
-                                  <li><a href="{{ url('/service') }}">Dịch vụ</a></li>
-                                  <li><a href="{{ url('/team') }}">Team</a></li>
-                                  <li><a href="{{ url('/faq') }}">FAQ</a></li>
-                              </ul>
-                          </li>
-                          <li><a href="shop.html">Cửa hàng</a></li>
-                          <li><a href="contact.html">Liên hệ</a></li>
-                      </ul>
-                  </div>
-                  <div class="ltn__utilize-buttons ltn__utilize-buttons-2">
-                      <ul>
-                          <li>
-                              <a href="account.html" title="Tài khoản">
-                                  <span class="utilize-btn-icon">
-                                      <i class="far fa-user"></i>
-                                  </span>
-                                  Tài khoản
-                              </a>
-                          </li>
-                          <li>
-                              <a href="wishlist.html" title="Yêu thích">
-                                  <span class="utilize-btn-icon">
-                                      <i class="far fa-heart"></i>
-                                      <sup>3</sup>
-                                  </span>
-                                  Yêu thích
-                              </a>
-                          </li>
-                          <li>
-                              <a href="cart.html" title="Giỏ hàng">
-                                  <span class="utilize-btn-icon">
-                                      <i class="fas fa-shopping-cart"></i>
-                                      <sup>5</sup>
-                                  </span>
-                                  Giỏ hàng
-                              </a>
-                          </li>
-                      </ul>
-                  </div>
-                  <div class="ltn__social-media-2">
-                      <ul>
-                          <li><a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a></li>
-                          <li><a href="#" title="Twitter"><i class="fab fa-twitter"></i></a></li>
-                          <li><a href="#" title="Linkedin"><i class="fab fa-linkedin"></i></a></li>
-                          <li><a href="#" title="Instagram"><i class="fab fa-instagram"></i></a></li>
-                      </ul>
-                  </div>
-              </div>
-          </div>
-          <!-- Utilize Mobile Menu End -->
+          @include('clients.partials.utilize_mobile')
+          <div class="ltn__utilize-overlay"></div>

@@ -15,68 +15,24 @@
 <body class="admin-login-page">
     <main class="auth-page">
         <div class="auth-shell">
-            <section class="auth-showcase"
-                style="--showcase-image: url('{{ asset('assets/clients/img/bg/15.jpg') }}')"
-                aria-label="Giới thiệu Veggie Shop">
-                <div class="showcase-top">
-                    <a class="brand brand-light" href="{{ route('home') }}" aria-label="Về trang chủ Veggie Shop">
-                        <span class="brand-mark" aria-hidden="true"><i class="fa fa-leaf"></i></span>
-                        <span class="brand-copy">
-                            <strong>Veggie Shop</strong>
-                            <small>Fresh food market</small>
-                        </span>
-                    </a>
-                    <span class="secure-badge"><i class="fa fa-shield"></i> Hệ thống nội bộ</span>
-                </div>
-                <div class="showcase-content">
-                    <span class="eyebrow">Quản lý cửa hàng thông minh</span>
-                    <h1>Tươi mỗi ngày,<br><span>chuẩn từng đơn.</span></h1>
-                    <p>Theo dõi hoạt động bán hàng, sản phẩm và khách hàng trong một không gian quản trị tập trung.</p>
-                    <div class="feature-grid" aria-label="Các chức năng quản trị">
-                        <div class="feature-item">
-                            <span><i class="fa fa-shopping-basket"></i></span>
-                            <div><strong>Đơn hàng</strong><small>Xử lý nhanh chóng</small></div>
-                        </div>
-                        <div class="feature-item">
-                            <span><i class="fa fa-cubes"></i></span>
-                            <div><strong>Kho hàng</strong><small>Kiểm soát chính xác</small></div>
-                        </div>
-                        <div class="feature-item">
-                            <span><i class="fa fa-line-chart"></i></span>
-                            <div><strong>Doanh thu</strong><small>Theo dõi trực quan</small></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="showcase-footer">
-                    <span><i class="fa fa-check-circle"></i> Thực phẩm tươi sạch</span>
-                    <span><i class="fa fa-check-circle"></i> Vận hành an toàn</span>
-                </div>
-            </section>
-            <section class="auth-panel">
+            <section class="auth-panel" aria-labelledby="login-title">
                 <div class="auth-panel-inner">
-                    <div class="mobile-header">
-                        <a class="brand" href="{{ route('home') }}" aria-label="Về trang chủ Veggie Shop">
-                            <span class="brand-mark" aria-hidden="true"><i class="fa fa-leaf"></i></span>
-                            <span class="brand-copy">
-                                <strong>Veggie Shop</strong>
-                                <small>Fresh food market</small>
-                            </span>
-                        </a>
-                    </div>
+                    <a class="brand" href="{{ route('home') }}" aria-label="Về trang chủ Broccoli Shop">
+                        <span class="brand-mark" aria-hidden="true"><i class="fa fa-leaf"></i></span>
+                        <strong>Broccoli Shop</strong>
+                    </a>
                     <div class="auth-heading">
-                        <span class="admin-label"><i class="fa fa-lock"></i> Khu vực quản trị</span>
-                        <h2>Chào mừng trở lại</h2>
-                        <p>Đăng nhập để tiếp tục quản lý cửa hàng của bạn.</p>
+                        <h1 id="login-title">Đăng nhập quản trị</h1>
+                        <p>Chào mừng bạn quay lại</p>
                     </div>
                     <form class="auth-form" action="{{ route('admin.login.post') }}" method="POST"
                         id="admin-login-form">
                         @csrf
                         <div class="form-group">
-                            <label for="email">Địa chỉ email</label>
+                            <label for="email">Email</label>
                             <div class="input-wrap @error('email') has-error @enderror">
-                                <i class="fa fa-envelope-o field-icon" aria-hidden="true"></i>
                                 <input id="email" type="email" name="email" value="{{ old('email') }}"
-                                    placeholder="admin@veggieshop.vn" autocomplete="email" required autofocus>
+                                    placeholder="admin@example.com" autocomplete="username" required autofocus>
                             </div>
                             @error('email')
                                 <span class="field-error" role="alert">
@@ -85,12 +41,8 @@
                             @enderror
                         </div>
                         <div class="form-group">
-                            <div class="label-row">
-                                <label for="password">Mật khẩu</label>
-                                <span>Tối thiểu 6 ký tự</span>
-                            </div>
+                            <label for="password">Mật khẩu</label>
                             <div class="input-wrap @error('password') has-error @enderror">
-                                <i class="fa fa-key field-icon" aria-hidden="true"></i>
                                 <input id="password" type="password" name="password" placeholder="Nhập mật khẩu"
                                     autocomplete="current-password" minlength="6" required>
                                 <button class="password-toggle" type="button" aria-label="Hiện mật khẩu"
@@ -105,19 +57,14 @@
                             @enderror
                         </div>
                         <button type="submit" class="login-button" data-submit-button>
-                            <span data-button-label>Đăng nhập hệ thống</span>
+                            <span data-button-label>Đăng nhập</span>
                             <i class="fa fa-arrow-right" aria-hidden="true"></i>
                         </button>
-                        <div class="security-note">
-                            <i class="fa fa-shield" aria-hidden="true"></i>
-                            <span>Chỉ quản trị viên và nhân viên được cấp quyền mới có thể truy cập.</span>
-                        </div>
                     </form>
                     <div class="auth-footer">
                         <a href="{{ route('home') }}">
-                            <i class="fa fa-long-arrow-left"></i> Quay lại cửa hàng
+                            <i class="fa fa-long-arrow-left" aria-hidden="true"></i> Về cửa hàng
                         </a>
-                        <span>&copy; {{ date('Y') }} Veggie Shop</span>
                     </div>
                 </div>
             </section>

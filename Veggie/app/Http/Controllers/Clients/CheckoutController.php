@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\DB;
 
 class CheckoutController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
         $cartItems = CartItem::where('user_id', $user->id)->with('product')->get();
@@ -32,6 +32,9 @@ class CheckoutController extends Controller
 
         $addresses = ShippingAddress::where('user_id', $user->id)->get();
         $defaultAddress = $addresses->where('default', 1)->first() ?? $addresses->first();
+        if ($request->filled('address_id')) {
+            $defaultAddress = $addresses->firstWhere('id', $request->query('address_id')) ?? $defaultAddress;
+        }
         $totalPrice = $cartItems->sum(fn ($item) => $item->quantity * $item->product->price);
 
         return view('clients.pages.checkout', compact('addresses', 'defaultAddress', 'cartItems', 'totalPrice'));
